@@ -307,7 +307,7 @@ onUnmounted(() => {
 .select-button.has-selection {
   --background: rgba(var(--ion-color-primary-rgb), 0.05);
   --border-color: var(--ion-color-primary);
-  --color: var(--ion-color-primary);
+  --color: var(--ion-color-dark);
 }
 
 /* Estilos del popover */

@@ -4,14 +4,14 @@
       <div class="search-container">
         <div class="input-container" :class="{ 'input-focused': isFocused, 'has-value': rucValue.length > 0 }" @click="focusInput">
           <Icon icon="material-symbols:search" class="search-icon" />
-          <input
+          <input 
             id="ruc"
             type="text"
-            placeholder="Ingresa tu RUC"
+            placeholder="RUC"
             v-model="rucValue"
             @focus="isFocused = true"
             @blur="isFocused = false"
-            class="native-input"
+            class="native-input "
             :class="{ 'has-value': rucValue.length > 0 }"
             ref="rucInput"
             required
@@ -29,12 +29,58 @@
       <Icon icon="mdi:alert-circle-outline" class="validation-error-icon" />
       <span>{{ validationError }}</span>
     </div>
+
+    <!-- Modal para empresa existente (MEJORADO) -->
+      
+      <!-- Contenido del modal -->
+      <ion-modal :is-open="showExistingCompanyModal" @didDismiss="showExistingCompanyModal = false" class="existing-company-modal">
+    <div class="modal-wrapper">
+      <!-- Encabezado del modal -->
+      <div class="modal-header">
+        <h3 class="modal-title">Coincidencia encontrada</h3>
+      </div>
+      
+      <!-- Contenido del modal -->
+      <div class="modal-content">
+        <!-- Mensaje adicional modificado con icono de información azul -->
+        <div class="notification-message">
+          <Icon icon="mdi:information-outline" class="notification-icon" />
+          <span>Esta empresa ya se encuentra registrada en el sistema.</span>
+        </div>
+        
+        <!-- Información de la empresa -->
+        <div class="company-info">
+          <div class="info-row">
+            <span class="info-label">RUC:</span>
+            <span class="info-value">{{ existingCompany.ruc }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Razón Social:</span>
+            <span class="info-value">{{ existingCompany.legalname }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Plan:</span>
+            <span class="info-value plan-badge">{{ existingCompany.typePlan }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Frecuencia:</span>
+            <span class="info-value frequency-badge">{{ existingCompany.frequencyType }}</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Pie del modal -->
+      <div class="modal-footer">
+        <ion-button expand="block" @click="showExistingCompanyModal = false" class="ok-button">OK</ion-button>
+      </div>
+    </div>
+  </ion-modal>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, defineEmits, watch, onMounted } from "vue"
-import { IonItem, IonButton, IonSpinner } from "@ionic/vue"
+import { IonItem, IonButton, IonSpinner, IonModal } from "@ionic/vue"
 import { Icon } from "@iconify/vue"
 import { useInitialData } from "@/composables/useInitialData"
 import { useWizardStore } from "@/stores/wizardStore"
@@ -42,7 +88,32 @@ import { useWizardStore } from "@/stores/wizardStore"
 // Obtener instancia del store
 const wizardStore = useWizardStore()
 
-// Base de datos simulada con 5 RUCs diferentes
+// Base de datos simulada con empresas existentes
+const companyDatabase = [
+  {
+    ruc: "1234567890001",
+    legalname: "EMPRESA EJEMPLO S.A.",
+    exist: true,
+    typePlan: "Plan Premium",
+    frequencyType: "Mensual"
+  },
+  {
+    ruc: "0987654321001",
+    legalname: "CORPORACIÓN TEST C.A.",
+    exist: true,
+    typePlan: "Plan Básico",
+    frequencyType: "Anual"
+  },
+  {
+    ruc: "1122334455001",
+    legalname: "SERVICIOS PRUEBA LTDA.",
+    exist: true,
+    typePlan: "Plan Pyme",
+    frequencyType: "Mensual"
+  }
+];
+
+// Base de datos simulada con 5 RUCs diferentes (original)
 const rucDatabase = [
   {
     ruc: "1792780241001",
@@ -168,7 +239,16 @@ const isFocused = ref(false)
 const rucInput = ref<HTMLInputElement | null>(null)
 const isLoading = ref(false)
 const validationError = ref("")
-const rucIsValid = ref(false) // Nueva variable para controlar la validez del RUC
+const rucIsValid = ref(false) // Variable para controlar la validez del RUC
+
+// Estado para el modal de empresa existente
+const showExistingCompanyModal = ref(false)
+const existingCompany = ref({
+  ruc: "",
+  legalname: "",
+  typePlan: "",
+  frequencyType: ""
+})
 
 // Definir los eventos que este componente puede emitir
 const emit = defineEmits(["ruc-searched", "ruc-not-found"])
@@ -203,6 +283,11 @@ const validateRuc = (ruc: string): boolean => {
   
   validationError.value = ""
   return true
+}
+
+// Verificar si el RUC ya existe en la base de datos simulada
+const checkExistingCompany = (ruc: string) => {
+  return companyDatabase.find(company => company.ruc === ruc && company.exist === true)
 }
 
 // Buscar un RUC en la base de datos simulada
@@ -288,7 +373,29 @@ const searchRuc = async () => {
     // Simular una petición a un servidor (esperar 1 segundo)
     await new Promise(resolve => setTimeout(resolve, 1000))
     
-    // Buscar el RUC en la base de datos simulada
+    // Verificar si la empresa ya existe en nuestra base de datos simulada
+    const existingCompanyData = checkExistingCompany(rucValue.value)
+    
+    if (existingCompanyData) {
+      console.log("Empresa ya existente:", existingCompanyData)
+      
+      // Guardar los datos de la empresa existente para mostrarlos en el modal
+      existingCompany.value = {
+        ruc: existingCompanyData.ruc,
+        legalname: existingCompanyData.legalname,
+        typePlan: existingCompanyData.typePlan,
+        frequencyType: existingCompanyData.frequencyType
+      }
+      
+      // Mostrar el modal
+      showExistingCompanyModal.value = true
+      
+      // No continuamos con la búsqueda en la base de datos del SRI
+      isLoading.value = false
+      return
+    }
+    
+    // Si no existe, buscar el RUC en la base de datos simulada del SRI
     const foundRuc = findRucInDatabase(rucValue.value)
     
     if (foundRuc) {
@@ -335,9 +442,29 @@ const searchRuc = async () => {
 </script>
 
 <style scoped>
+/* Estilos originales del componente */
 .custom-item {
   --padding-start: 0;
   --inner-padding-end: 0;
+}
+
+.notification-message {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #e6f0ff;
+  padding: 8px 8px;
+  border-radius: 7px;
+  font-size: 0.75rem;
+  color: #2c4b7a;
+  width: 100%;
+  margin-top: 5px;
+}
+
+.notification-icon {
+  color: #0054e9;
+  font-size: 18px;
+  flex-shrink: 0;
 }
 
 .search-container {
@@ -384,12 +511,13 @@ const searchRuc = async () => {
   border: none;
   outline: none;
   background: transparent;
-  font-size: 16px;
+  font-size: 14px;
   font-family: inherit;
   color: #333;
   padding: 0;
   width: 100%;
   caret-color: #0054e9;
+  
 }
 
 .native-input.has-value {
@@ -438,5 +566,177 @@ const searchRuc = async () => {
 
 .validation-error-icon {
   font-size: 16px;
+}
+
+/* NUEVOS ESTILOS MEJORADOS PARA EL MODAL */
+.existing-company-modal::part(content) {
+  width: 90%;
+  max-width: 400px;
+  height: auto;
+  border-radius: 16px;
+  --backdrop-opacity: 0.5;
+}
+
+.modal-wrapper {
+  width: 100%;
+  background-color: white;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.15);
+  animation: modalFadeIn 0.3s ease;
+}
+
+@keyframes modalFadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.modal-header {
+  background-color: var(--ion-color-primary);
+  color: white;
+  padding: 12px;
+  text-align: center;
+  position: relative;
+}
+
+.modal-title {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.modal-content {
+  padding: 8px 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.info-icon-container {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: rgba(var(--ion-color-primary-rgb), 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.info-icon {
+  font-size: 32px;
+  color: var(--ion-color-primary);
+}
+
+.company-info {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background-color: #f8fafc;
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid #e2e8f0;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.info-row:last-child {
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.info-label {
+  font-weight: 600;
+  color: #475569;
+  font-size: 0.95rem;
+}
+
+.info-value {
+  color: #1e293b;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.plan-badge, .frequency-badge {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.plan-badge {
+  background-color: rgba(var(--ion-color-primary-rgb), 0.1);
+  color: var(--ion-color-primary);
+}
+
+.frequency-badge {
+  background-color: rgba(var(--ion-color-success-rgb), 0.1);
+  color: var(--ion-color-success);
+}
+
+.modal-message {
+  text-align: center;
+  color: #64748b;
+  font-size: 0.95rem;
+  margin: 0;
+  padding: 0 10px;
+}
+
+.modal-footer {
+  padding: 10px 100px 10px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.ok-button {
+  --background: var(--ion-color-primary);
+  --color: white;
+  --border-radius: 10px;
+  margin: 0;
+  font-weight: 600;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 12px rgba(var(--ion-color-primary-rgb), 0.25);
+  transition: all 0.3s ease;
+}
+
+.ok-button:hover {
+  --background: var(--ion-color-primary-shade);
+  box-shadow: 0 6px 16px rgba(var(--ion-color-primary-rgb), 0.3);
+  transform: translateY(-2px);
+}
+
+/* Estilos responsivos */
+@media (max-width: 480px) {
+  .existing-company-modal::part(content) {
+    width: 95%;
+  }
+  
+  .modal-title {
+    font-size: 1rem;
+  }
+  
+  .info-icon-container {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .info-icon {
+    font-size: 28px;
+  }
+  
+  .company-info {
+    padding: 12px;
+  }
+  
+  .info-label, .info-value {
+    font-size: 0.9rem;
+  }
 }
 </style>

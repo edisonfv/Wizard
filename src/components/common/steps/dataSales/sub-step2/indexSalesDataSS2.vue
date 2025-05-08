@@ -8,7 +8,7 @@
             <!-- Sección de selección de vendedor -->
             <div class="p-3 rounded-xl shadow-sm bg-blue-50 w-full vendor-section">
               <h4 class="text-lg font-semibold text-gray-800 border-opacity-6">
-                Selecciona tu nombre para registrar tu venta
+                Selecciona tu nombre para registrar la venta
               </h4>
               <salesListe class="w-full" />
             </div>

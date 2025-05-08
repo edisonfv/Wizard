@@ -6,8 +6,7 @@
         <ion-card-header class="pb-0">
           <ion-card-title class="card-title">Búsqueda y Validación de RUC</ion-card-title>
           <ion-card-subtitle class="card-subtitle">
-            Ingresa tu RUC para validar la información de tu empresa
-          </ion-card-subtitle>
+            Ingresa el RUC para verificar si la empresa existe en el sistema          </ion-card-subtitle>
         </ion-card-header>
         
         <ion-card-content class="search-section">
@@ -102,7 +101,7 @@ const handleRucNotFound = (rucNumber: string) => {
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   overflow: hidden;
-  background-color: white;
+  background-color: #f0f7ff;
   transition: all 0.3s ease;
 }
 

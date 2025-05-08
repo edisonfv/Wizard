@@ -38,9 +38,9 @@
     <!-- Dirección de la Sucursal -->
     <FormField
       v-model="data.branch.address"
-      label="Dirección de la Matriz"
+      label="Dirección"
       icon="mdi:map-marker"
-      placeholder="Dirección de la matriz"
+      placeholder="Dirección"
       required
       @validation="(isValid) => handleValidation('address', isValid)"
     />
@@ -48,7 +48,7 @@
     <!-- Teléfono de la sucursal -->
     <FormField
       v-model="data.branch.phone"
-      label="Teléfono de la Matriz"
+      label="Teléfono"
       icon="mdi:phone"
       placeholder="+593"
       required
@@ -59,9 +59,9 @@
     <!-- Correo de la Sucursal -->
     <FormField
       v-model="data.branch.email"
-      label="Correo de la Matriz"
+      label="Email"
       icon="mdi:email"
-      placeholder="Email de la Matriz"
+      placeholder="Email"
       required
       @input="handleEmailInput"
       @validation="(isValid) => handleValidation('email', isValid)"

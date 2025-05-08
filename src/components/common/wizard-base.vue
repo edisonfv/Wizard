@@ -206,8 +206,9 @@ const handleNext = () => {
     return;
   }
 
-  // Verificar si estamos en el paso data-sales y subpaso 1 (indexSalesDataSS2)
-  if (currentStepKey.value === "data-sales" && currentSubStepIndex.value === 1) {
+  // MODIFICACIÓN: Mostrar el modal de confirmación de ventas cuando estamos
+  // en el paso data-sales y el subpaso 2 (indexSalesDataSS2)
+  if (currentStepKey.value === "data-sales" && currentSubStepIndex.value === 2) {
     // Verificar si se cumplen todas las condiciones para habilitar el botón
     if (!shouldDisableNextButton.value) {
       // Mostrar el modal de confirmación de ventas

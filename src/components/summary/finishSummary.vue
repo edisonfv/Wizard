@@ -17,38 +17,33 @@
 
     <!-- Contenedor principal con diseño de factura -->
     <div class="summary-content">
-      <!-- Sección de Datos Personales y de la Empresa -->
+      <!-- Sección de Datos del Usuario -->
       <section class="summary-section">
-        <h3 class="section-title">Datos Generales</h3>
+        <h3 class="section-title">Datos del Usuario</h3>
         <div class="data-grid">
-          <!-- Datos Personales -->
           <div class="data-column">
-            <h4 class="data-title">Datos Personales</h4>
-            <div class="data-item" v-if="personalInfo.identification.type">
-              <span class="data-label">Tipo de ID:</span>
-              <span class="data-value">{{ getIdentificationType(personalInfo.identification.type) }}</span>
-            </div>
-            <div class="data-item" v-if="personalInfo.identification.number">
-              <span class="data-label">Número:</span>
-              <span class="data-value">{{ personalInfo.identification.number }}</span>
-            </div>
-            <div class="data-item" v-if="personalInfo.name.first || personalInfo.name.last">
+            <div class="data-item" v-if="createUser.name">
               <span class="data-label">Nombre:</span>
-              <span class="data-value">{{ personalInfo.name.first }} {{ personalInfo.name.last }}</span>
+              <span class="data-value">{{ createUser.name }}</span>
             </div>
-            <div class="data-item" v-if="personalInfo.contact.email">
+            <div class="data-item" v-if="createUser.email">
               <span class="data-label">Email:</span>
-              <span class="data-value" :title="personalInfo.contact.email">{{ personalInfo.contact.email }}</span>
+              <span class="data-value" :title="createUser.email">{{ createUser.email }}</span>
             </div>
-            <div class="data-item" v-if="personalInfo.contact.phone">
-              <span class="data-label">Teléfono:</span>
-              <span class="data-value">{{ personalInfo.contact.phone }}</span>
+            <div class="data-item" v-if="createUser.rol?.name">
+              <span class="data-label">Rol:</span>
+              <span class="data-value">{{ createUser.rol.name }}</span>
             </div>
           </div>
+        </div>
+      </section>
 
-          <!-- Datos de la Empresa -->
+      <!-- Sección unificada de Datos de la Empresa -->
+      <section class="summary-section">
+        <h3 class="section-title">Datos de la Empresa</h3>
+        <div class="data-grid">
+          <!-- Columna izquierda con datos principales -->
           <div class="data-column">
-            <h4 class="data-title">Datos de la Empresa</h4>
             <div class="data-item" v-if="companyCreation.ruc">
               <span class="data-label">RUC:</span>
               <span class="data-value">{{ companyCreation.ruc }}</span>
@@ -57,21 +52,33 @@
               <span class="data-label">Razón Social:</span>
               <span class="data-value" :title="companyCreation.legalName">{{ companyCreation.legalName }}</span>
             </div>
-            <div class="data-item" v-if="companyCreation.name">
-              <span class="data-label">Nombre:</span>
-              <span class="data-value" :title="companyCreation.name">{{ companyCreation.name }}</span>
+            <div class="data-item" v-if="branchAndPOS.branch.commercialName">
+              <span class="data-label">Nombre Comercial:</span>
+              <span class="data-value" :title="branchAndPOS.branch.commercialName">{{ branchAndPOS.branch.commercialName }}</span>
             </div>
-            <div class="data-item" v-if="companyCreation.address">
+            <div class="data-item" v-if="branchAndPOS.branch.address">
               <span class="data-label">Dirección:</span>
-              <span class="data-value" :title="companyCreation.address">{{ companyCreation.address }}</span>
+              <span class="data-value" :title="branchAndPOS.branch.address">{{ branchAndPOS.branch.address }}</span>
             </div>
-             <div class="data-item" v-if="companyCreation.phone">
+          </div>
+          
+          <!-- Columna derecha con datos de contacto y punto de emisión -->
+          <div class="data-column">
+            <div class="data-item" v-if="branchAndPOS.branch.phone">
               <span class="data-label">Teléfono:</span>
-              <span class="data-value">{{ companyCreation.phone }}</span>
+              <span class="data-value">{{ branchAndPOS.branch.phone }}</span>
             </div>
-            <div class="data-item" v-if="companyCreation.businessEmail">
+            <div class="data-item" v-if="branchAndPOS.branch.email">
               <span class="data-label">Email:</span>
-              <span class="data-value" :title="companyCreation.businessEmail">{{ companyCreation.businessEmail }}</span>
+              <span class="data-value" :title="branchAndPOS.branch.email">{{ branchAndPOS.branch.email }}</span>
+            </div>
+            <div class="data-item" v-if="branchAndPOS.pointOfSale.idPos">
+              <span class="data-label">Código Punto Emisión:</span>
+              <span class="data-value">{{ branchAndPOS.pointOfSale.idPos }}</span>
+            </div>
+            <div class="data-item" v-if="branchAndPOS.pointOfSale.name">
+              <span class="data-label">Nombre Punto Emisión:</span>
+              <span class="data-value" :title="branchAndPOS.pointOfSale.name">{{ branchAndPOS.pointOfSale.name }}</span>
             </div>
           </div>
         </div>
@@ -81,7 +88,16 @@
       <section class="summary-section">
         <h3 class="section-title">Configuración de la Empresa</h3>
         <div class="data-grid">
+          <!-- Columna izquierda con configuraciones fiscales -->
           <div class="data-column">
+            <div class="data-item">
+              <span class="data-label">Régimen:</span>
+              <span class="data-value">{{ companyConfig.regimeRUC || 'No especificado' }}</span>
+            </div>
+            <div class="data-item">
+              <span class="data-label">Categoría:</span>
+              <span class="data-value">{{ companyConfig.categoryRUC || 'No especificada' }}</span>
+            </div>
             <div class="data-item">
               <span class="data-label">Agente Retención:</span>
               <span class="data-value">{{ companyConfig.taxAgent?.isAgent ? 'Sí' : 'No' }}</span>
@@ -90,6 +106,10 @@
               <span class="data-label">Contabilidad:</span>
               <span class="data-value">{{ companyConfig.taxAgent?.accountingRequired ? 'Obligatoria' : 'No obligatoria' }}</span>
             </div>
+          </div>
+          
+          <!-- Columna derecha con configuraciones operativas -->
+          <div class="data-column">
             <div class="data-item">
               <span class="data-label">Artesano:</span>
               <span class="data-value">{{ artisanText }}</span>
@@ -98,74 +118,60 @@
               <span class="data-label">Nº Artesano:</span>
               <span class="data-value">{{ companyConfig.artisan.artisanNumber }}</span>
             </div>
-          </div>
-          <div class="data-column">
             <div class="data-item" v-if="companyConfig.defaultDocument">
               <span class="data-label">Doc. Defecto:</span>
               <span class="data-value">{{ getDocumentType(companyConfig.defaultDocument) }}</span>
-            </div>
-            <div class="data-item" v-if="companyConfig.searchParameter">
-              <span class="data-label">Búsqueda:</span>
-              <span class="data-value">{{ getSearchParameter(companyConfig.searchParameter) }}</span>
             </div>
             <div class="data-item" v-if="companyConfig.taxes && companyConfig.taxes.length > 0">
               <span class="data-label">Impuestos:</span>
               <span class="data-value">{{ formatTaxes(companyConfig.taxes) }}</span>
             </div>
-            <div class="data-item" v-if="companyConfig.taxesFiveNumber">
-              <span class="data-label">Código 5%:</span>
-              <span class="data-value">{{ companyConfig.taxesFiveNumber }}</span>
-            </div>
+          </div>
+        </div>
+        
+        <!-- Características adicionales -->
+        <div class="features-grid">
+          <div class="feature-item" :class="{ 'feature-active': branchAndPOS.branch.delayedDispatch }">
+            <ion-icon :icon="branchAndPOS.branch.delayedDispatch ? checkmarkCircle : closeCircle" class="feature-icon"></ion-icon>
+            <span>Despacho Posterior</span>
+          </div>
+          <div class="feature-item" :class="{ 'feature-active': branchAndPOS.branch.isTouristEstablishment }">
+            <ion-icon :icon="branchAndPOS.branch.isTouristEstablishment ? checkmarkCircle : closeCircle" class="feature-icon"></ion-icon>
+            <span>Establecimiento Turístico</span>
           </div>
         </div>
       </section>
-
-      <!-- Sección de Sucursal y Punto de Venta -->
-      <section class="summary-section">
-        <h3 class="section-title">Matriz y Punto de Emisión</h3>
+      
+      <!-- Sección de Plan y Pago (solo si existe) -->
+      <section class="summary-section" v-if="hasSalesData">
+        <h3 class="section-title">Plan y Pago</h3>
         <div class="data-grid">
           <div class="data-column">
-            <div class="data-item" v-if="branchAndPOS.branch.idBranch">
-              <span class="data-label">Cód. Matriz:</span>
-              <span class="data-value">{{ branchAndPOS.branch.idBranch }}</span>
+            <div class="data-item" v-if="salesData.plan">
+              <span class="data-label">Plan:</span>
+              <span class="data-value">{{ getPlanName(salesData.plan) }}</span>
             </div>
-            <div class="data-item" v-if="branchAndPOS.branch.commercialName">
-              <span class="data-label">Nombre Comercial:</span>
-              <span class="data-value" :title="branchAndPOS.branch.commercialName">{{ branchAndPOS.branch.commercialName }}</span>
+            <div class="data-item" v-if="salesData.billingFrequency">
+              <span class="data-label">Frecuencia:</span>
+              <span class="data-value">{{ capitalizeFirst(salesData.billingFrequency) }}</span>
             </div>
-            <div class="data-item" v-if="branchAndPOS.branch.name">
-              <span class="data-label">Nombre Matriz:</span>
-              <span class="data-value" :title="branchAndPOS.branch.name">{{ branchAndPOS.branch.name }}</span>
-            </div>
-            <div class="data-item" v-if="branchAndPOS.branch.address">
-              <span class="data-label">Dirección:</span>
-              <span class="data-value" :title="branchAndPOS.branch.address">{{ branchAndPOS.branch.address }}</span>
-            </div>
-             <div class="data-item" v-if="branchAndPOS.branch.phone">
-              <span class="data-label">Teléfono:</span>
-              <span class="data-value">{{ branchAndPOS.branch.phone }}</span>
-            </div>
-            <div class="data-item" v-if="branchAndPOS.branch.email">
-              <span class="data-label">Email:</span>
-              <span class="data-value" :title="branchAndPOS.branch.email">{{ branchAndPOS.branch.email }}</span>
+            <div class="data-item" v-if="salesData.paymentMethod">
+              <span class="data-label">Método de Pago:</span>
+              <span class="data-value">{{ getPaymentMethodName(salesData.paymentMethod) }}</span>
             </div>
           </div>
           <div class="data-column">
-            <div class="data-item" v-if="branchAndPOS.pointOfSale.idPos">
-              <span class="data-label">Cód. Punto Emisión:</span>
-              <span class="data-value">{{ branchAndPOS.pointOfSale.idPos }}</span>
+            <div class="data-item" v-if="salesData.payment?.amount">
+              <span class="data-label">Monto:</span>
+              <span class="data-value highlight">${{ formatAmount(salesData.payment.amount) }}</span>
             </div>
-            <div class="data-item" v-if="branchAndPOS.pointOfSale.name">
-              <span class="data-label">Nombre P. Emisión:</span>
-              <span class="data-value" :title="branchAndPOS.pointOfSale.name">{{ branchAndPOS.pointOfSale.name }}</span>
+            <div class="data-item" v-if="salesData.payment?.date">
+              <span class="data-label">Fecha:</span>
+              <span class="data-value">{{ formatDate(salesData.payment.date) }}</span>
             </div>
-            <div class="data-item">
-              <span class="data-label">Despacho Posterior:</span>
-              <span class="data-value">{{ branchAndPOS.branch.delayedDispatch ? 'Sí' : 'No' }}</span>
-            </div>
-            <div class="data-item">
-              <span class="data-label">Est. Turístico:</span>
-              <span class="data-value">{{ branchAndPOS.branch.isTouristEstablishment ? 'Sí' : 'No' }}</span>
+            <div class="data-item" v-if="consultantData?.sellerName">
+              <span class="data-label">Vendedor:</span>
+              <span class="data-value">{{ consultantData.sellerName }}</span>
             </div>
           </div>
         </div>
@@ -177,35 +183,37 @@
 <script setup lang="ts">
 import { computed, onMounted } from 'vue';
 import { useWizardStore } from "@/stores/wizardStore";
-import { informationCircle } from 'ionicons/icons';
+import { informationCircle, checkmarkCircle, closeCircle } from 'ionicons/icons';
 
 // Obtener la instancia del store
 const wizardStore = useWizardStore();
 
 // Inicializar los datos del store al montar el componente
 onMounted(() => {
-  personalInfo.value;
+  createUser.value;
   companyCreation.value;
   companyConfig.value;
   branchAndPOS.value;
+  salesData.value;
+  consultantData.value;
   hasLogo.value;
   logoUrl.value;
   artisanText.value;
+  hasSalesData.value;
 });
 
 // Obtener los datos del store
-const personalInfo = computed(() => {
-  return wizardStore.getStepData("personalInfo") || {
-    identification: { type: "", number: "" },
-    name: { first: "", last: "" },
-    contact: { email: "", phone: "" }
+const createUser = computed(() => {
+  return wizardStore.getStepData("createUser") || {
+    name: "",
+    email: "",
+    rol: { name: "" }
   };
 });
 
 const companyCreation = computed(() => {
   return wizardStore.getStepData("companyCreation") || {
     ruc: "",
-    name: "",
     legalName: "",
     domain: "",
     address: "",
@@ -251,6 +259,32 @@ const branchAndPOS = computed(() => {
   };
 });
 
+const salesData = computed(() => {
+  return wizardStore.getStepData("salesData") || {
+    plan: "",
+    billingFrequency: "",
+    paymentMethod: "",
+    payment: {
+      amount: 0,
+      date: "",
+      transferData: {},
+      datafastData: {}
+    }
+  };
+});
+
+const consultantData = computed(() => {
+  return wizardStore.getStepData("consultant") || {
+    sellerId: "",
+    sellerName: ""
+  };
+});
+
+// Computed para verificar si hay datos de venta
+const hasSalesData = computed(() => {
+  return salesData.value && (salesData.value.plan || salesData.value.billingFrequency || salesData.value.paymentMethod);
+});
+
 // Computed para verificar si hay un logo disponible
 const hasLogo = computed(() => {
   // Verificar primero en companyConfig
@@ -283,28 +317,12 @@ const logoUrl = computed(() => {
 });
 
 // Funciones de utilidad para formatear datos
-const getIdentificationType = (type: string): string => {
-  const types: Record<string, string> = {
-    'cedula': 'Cédula',
-    'ruc': 'RUC'
-  };
-  return types[type] || type;
-};
-
 const getDocumentType = (type: string): string => {
   const types: Record<string, string> = {
     'facturas': 'Facturas Electrónicas',
     'recibos': 'Recibos'
   };
   return types[type] || type;
-};
-
-const getSearchParameter = (param: string): string => {
-  const params: Record<string, string> = {
-    'nombre': 'Por Nombre',
-    'codigo': 'Por Código'
-  };
-  return params[param] || param;
 };
 
 // Función para formatear los impuestos con tipado correcto
@@ -318,6 +336,47 @@ const formatTaxes = (taxes: string[]): string => {
 const artisanText = computed(() => {
   return companyConfig.value.artisan?.isArtisan ? 'Sí' : 'No';
 });
+
+// Funciones para formatear datos de ventas
+const getPlanName = (planValue: string): string => {
+  const planMap: Record<string, string> = {
+    'freeplan': 'Plan Gratuito',
+    'liteplan': 'Plan Lite',
+    'basicplan': 'Plan Básico',
+    'pymeplan': 'Plan Pyme'
+  };
+  
+  return planMap[planValue] || planValue;
+};
+
+const getPaymentMethodName = (methodValue: string): string => {
+  const methodMap: Record<string, string> = {
+    'transferencia': 'Transferencia Bancaria',
+    'datafast-voucher': 'Datafast Voucher'
+  };
+  
+  return methodMap[methodValue] || methodValue;
+};
+
+const formatAmount = (amount: number): string => {
+  return amount.toFixed(2);
+};
+
+const formatDate = (dateString: string): string => {
+  if (!dateString) return "";
+  
+  const date = new Date(dateString);
+  return date.toLocaleDateString('es-ES', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  });
+};
+
+const capitalizeFirst = (str: string): string => {
+  if (!str) return "";
+  return str.charAt(0).toUpperCase() + str.slice(1);
+};
 </script>
 
 <style scoped>
@@ -407,6 +466,8 @@ const artisanText = computed(() => {
   font-weight: 600;
   color: #0f172a;
   margin-bottom: 12px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 /* Grid para organizar los datos en dos columnas */
@@ -419,13 +480,9 @@ const artisanText = computed(() => {
 .data-column {
   flex: 1 1 300px; /* Cada columna ocupa al menos 300px o 1fr del espacio disponible */
   min-width: 300px;
-}
-
-.data-title {
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: #4b5563;
-  margin-bottom: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 /* Estilos para cada item de datos */
@@ -451,6 +508,46 @@ const artisanText = computed(() => {
   color: #334155;
   text-align: right;
   word-break: break-word;
+  max-width: 60%;
+}
+
+.data-value.highlight {
+  color: #003cff;
+  font-size: 1rem;
+}
+
+/* Grid para características adicionales */
+.features-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.feature-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background-color: #f9fafb;
+  border: 1px solid #e5e7eb;
+  flex: 1 1 200px;
+  min-width: 200px;
+}
+
+.feature-active {
+  background-color: rgba(0, 60, 255, 0.05);
+  border-color: rgba(0, 60, 255, 0.2);
+}
+
+.feature-active .feature-icon {
+  color: #003cff;
+}
+
+.feature-icon {
+  font-size: 1.2rem;
+  color: #64748b;
 }
 
 /* Estilos responsivos */
@@ -478,12 +575,8 @@ const artisanText = computed(() => {
     height: 60px;
   }
   
-  .data-grid {
-    flex-direction: column;
-  }
-  
   .data-column {
-    min-width: auto;
+    min-width: 100%;
   }
 }
 
@@ -499,6 +592,10 @@ const artisanText = computed(() => {
   .company-logo {
     width: 50px;
     height: 50px;
+  }
+  
+  .feature-item {
+    min-width: 100%;
   }
 }
 </style>

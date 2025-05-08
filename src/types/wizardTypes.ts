@@ -7,18 +7,15 @@ export interface WizardState {
 }
 
 // Interfaces para la información personal
-export interface PersonalInfo {
-  identification: {
-    type: string
-    number: string
-  }
-  name: {
-    first: string
-    last: string
-  }
-  contact: {
-    email: string
-    phone: string
+export interface createUser {
+  name: string
+  email: string
+  base64: string
+  rol:{
+    id: string
+    name: string
+    is_main: boolean
+    description: null
   }
 }
 
@@ -31,7 +28,6 @@ export interface Consultant {
 // Interfaces para la creación de la empresa
 export interface CompanyCreation {
   ruc: string
-  name: string
   legalName: string
   domain: string
   address: string
@@ -104,7 +100,7 @@ export interface BranchAndPOS {
 
 // Interfaz para los datos del formulario
 export interface FormData {
-  personalInfo: PersonalInfo
+  createUser: createUser
   consultant: Consultant
   companyCreation: CompanyCreation
   salesData: SalesData

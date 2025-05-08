@@ -45,7 +45,7 @@ export function useWizardNavigation(
   
   // Definir los pasos comunes a todos los tipos de wizard
   const commonSteps: WizardStep[] = [
-    { label: "Datos Personales", key: "personal-info" },
+    { label: "Creacion de Usuario", key: "personal-info" },
     { label: "Configuraciones de la Empresa", key: "config-company" },
     { label: "Datos de la Empresa", key: "create-company" },
   ]

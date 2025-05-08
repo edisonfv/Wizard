@@ -8,19 +8,16 @@ export const initialState = (): WizardInterface => ({
     currentSubStep: 0,
   },
   formData: {
-    personalInfo: {
-      identification: {
-        type: "",
-        number: "",
-      },
-      name: {
-        first: "",
-        last: "",
-      },
-      contact: {
-        email: "",
-        phone: "",
-      },
+    createUser: {
+      name: "",
+      email: "",
+      base64: "",
+      rol: {
+        id: "9de79ed8-b4f0-48bb-ab5d-6caca8a454ed",
+        name: "Administrador",
+        is_main: true,
+        description: null
+      }
     },
     consultant: {
       sellerId: "",
@@ -28,7 +25,6 @@ export const initialState = (): WizardInterface => ({
     },
     companyCreation: {
       ruc: "",
-      name: "",
       legalName: "",
       domain: "",
       address: "",

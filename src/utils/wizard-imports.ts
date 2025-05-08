@@ -54,7 +54,7 @@ export function getBaseSubStepsConfig() {
       { title: "create-company SS2", component: components.indexCreateCompanySS2 },
     ],
     "config-company": [
-      { title: "config-comapny SS1", component: components.indexConfigCompanySS1 },
+      // Eliminamos indexConfigCompanySS1 de aquí
       { title: "config-comapny SS2", component: components.indexConfiCompanySS2 },
     ],
   }
@@ -68,8 +68,11 @@ export function getVentasSubStepsConfig() {
   return {
     ...baseConfig,
     "data-sales": [
-      { title: "data-sales SS1", component: components.indexSalesDataSS1 },
-      { title: "data-sales SS2", component: components.indexSalesDataSS2 },
+      // Añadimos indexConfigCompanySS1 como primer substep en data-sales
+      { title: "data-sales SS1", component: components.indexConfigCompanySS1 },
+      // Movemos los substeps originales después
+      { title: "data-sales SS2", component: components.indexSalesDataSS1 },
+      { title: "data-sales SS3", component: components.indexSalesDataSS2 },
     ],
   }
 }

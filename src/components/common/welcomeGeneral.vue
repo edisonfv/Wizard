@@ -28,8 +28,7 @@
             <!-- Descripción con texto más claro y conciso -->
             <div class="description-container">
               <p class="description-text">
-                Este asistente te guiará paso a paso para configurar tu empresa 
-                de forma rápida y sencilla. Completarás el proceso en pocos minutos.
+                Este asistente te guiará paso a paso para crear y configurar una empresa de forma rápida y sencilla.
               </p>
             </div>
             

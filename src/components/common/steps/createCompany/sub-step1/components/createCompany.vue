@@ -27,50 +27,6 @@
       />
     </div>
 
-    <!-- Nombre empresa -->
-    <FormField
-      v-model="data.name"
-      label="Nombre de tu Empresa"
-      icon="mdi:office-building"
-      placeholder="Nombre de tu empresa"
-      required
-      @input="handleNameCompanyInput"
-      @validation="(isValid) => handleValidation('name', isValid)"
-    />
-
-    <!-- Dirección de la Empresa -->
-    <FormField
-      v-model="data.address"
-      label="Dirección de tu Empresa"
-      icon="mdi:map-marker"
-      placeholder="Dirección de tu empresa"
-      required
-      @validation="(isValid) => handleValidation('address', isValid)"
-    />
-
-    <!-- Teléfonos -->
-    <FormField
-      v-model="data.phone"
-      label="Teléfonos de tu empresa"
-      icon="mdi:phone"
-      placeholder="+593"
-      required
-      @input="handlePhoneInput"
-      @validation="(isValid) => handleValidation('phone', isValid)"
-    />
-
-    <!-- Correo Electrónico Empresarial -->
-    <FormField
-      v-model="data.businessEmail"
-      label="Correo Electrónico Empresarial"
-      icon="mdi:email"
-      placeholder="Email empresarial"
-      required
-      @input="handleEmailInput"
-      @validation="(isValid) => handleValidation('businessEmail', isValid)"
-      :validator="validateEmailInput"
-      errorMessage="Por favor, ingrese un correo electrónico válido"
-    />
   </form>
 </template>
 
@@ -79,9 +35,6 @@ import { ref } from 'vue';
 import FormField from "@/components/ui/FormField.vue";
 import { useInitialData } from "@/composables/useInitialData";
 import { 
-  allowOnlyLettersSpacesAndNumbers,
-  formatPhoneNumber,
-  validateEmailInRealTime
 } from "@/utils/input-controls";
 
 // Valores iniciales para el formulario
@@ -122,27 +75,6 @@ const handleValidation = (field: ValidationKey, isValid: boolean) => {
   validationState.value[field] = isValid;
 };
 
-// Manejadores de eventos para los inputs con validación
-const handleNameCompanyInput = (event: Event) => {
-  // const input = event.target as HTMLInputElement;
-  data.value.name = allowOnlyLettersSpacesAndNumbers(event);
-};
-
-const handlePhoneInput = (event: Event) => {
-  data.value.phone = formatPhoneNumber(event);
-};
-
-const handleEmailInput = (event: Event) => {
-  // Usar la función de validación en tiempo real
-  const result = validateEmailInRealTime(event);
-  data.value.businessEmail = result.value;
-  // Actualizar el estado de validación
-  handleValidation('businessEmail', result.isValid);
-};
-// Función de validación para el email que devuelve un objeto con value e isValid
-const validateEmailInput = (event: Event) => {
-  return validateEmailInRealTime(event);
-};
 </script>
 
 <style scoped>

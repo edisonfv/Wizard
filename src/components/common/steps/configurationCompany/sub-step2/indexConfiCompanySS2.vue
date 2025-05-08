@@ -7,7 +7,7 @@
         <!-- Columna 1 - Información y configuración principal (60%) -->
         <div class="flex flex-col gap-2 lg:w-[55%]">
           <!-- Sección 1: Datos informativos -->
-          <div class="bg-white rounded-xl p-3 shadow-sm border border-gray-100">
+          <div class="bg-[#f0f7ff] rounded-xl p-3 shadow-sm border border-gray-100">
             <h3 class="font-medium text-lg mb-3 flex items-center text-black">
               <b>Datos informativos <span class="text-blue-700 pl-1">*</span></b>
             </h3>
@@ -19,17 +19,17 @@
           </div>
 
           <!-- Sección 2: Contabilidad -->
-          <div class="bg-white rounded-xl p-3 shadow-sm border border-gray-100">
+          <div class="bg-[#f0f7ff] rounded-xl p-3 shadow-sm border border-gray-100">
             <accountingRUC :form-data="formData" @update="updateFormData" />
           </div>
 
           <!-- Sección 3: Artesano -->
-          <div class="bg-white rounded-xl p-3 shadow-sm border border-gray-100">
+          <div class="bg-[#f0f7ff] rounded-xl p-3 shadow-sm border border-gray-100">
             <artisanRUC :form-data="formData" @update="updateFormData" />
           </div>
 
           <!-- Sección 4: Despacho y Turismo -->
-          <div class="bg-white rounded-xl p-3 shadow-sm border border-gray-100">
+          <div class="bg-[#f0f7ff] rounded-xl p-3 shadow-sm border border-gray-100">
             <dispatch_touris :form-data="formData" @update="updateFormData" />
           </div>
         </div>
@@ -40,18 +40,18 @@
           <!-- Grid de 2 columnas para las dos secciones independientes -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <!-- Columna para docDefault -->
-            <div class="bg-white rounded-xl p-3 shadow-sm border border-gray-100">
+            <div class="bg-[#f0f7ff] rounded-xl p-3 shadow-sm border border-gray-100">
               <docDefault :form-data="formData" @update="updateFormData" />
             </div>
 
             <!-- Columna para parameterSearch -->
-            <div class="bg-white rounded-xl p-3 shadow-sm border border-gray-100">
+            <div class="bg-[#f0f7ff] rounded-xl p-3 shadow-sm border border-gray-100">
               <parameterSearch :form-data="formData" @update="updateFormData" />
             </div>
           </div>
 
           <!-- Sección 2: Impuestos -->
-          <div class="bg-white rounded-xl p-3 shadow-sm border border-gray-100">
+          <div class="bg-[#f0f7ff] rounded-xl p-3 shadow-sm border border-gray-100">
             <taxesRUC :form-data="formData" @update="updateFormData" />
           </div>
         </div>

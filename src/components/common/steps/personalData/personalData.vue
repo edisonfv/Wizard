@@ -3,48 +3,19 @@
     <ion-card class="wizard-card main-container">
       <ion-card-content class="wizard-content">
         <div class="section-container">
-          <h4 class="section-title">Datos Personales</h4>
+          <div class="header-container">
+            <h4 class="section-title">Creación de usuario</h4>
+            <h5 class="section-subtitle">Completa los datos del cliente para crear su usuario</h5>
+          </div>
           
           <div class="w-full">
             <form @submit.prevent class="form-container">
-              <!-- Tipo de identificación -->
-              <div class="form-row">
-                <FormField
-                  v-model="data.identification.type"
-                  label="Tipo de Identificación"
-                  icon="mdi:cards"
-                  type="select"
-                  required
-                  @validation="(isValid) => handleValidation('identificationType', isValid)"
-                >
-                  <option value="" disabled selected>Seleccionar</option>
-                  <option 
-                    v-for="opcion in opcionesTipoID" 
-                    :key="opcion.value" 
-                    :value="opcion.value"
-                  >
-                    {{ opcion.label }}
-                  </option>
-                </FormField>
-                
-                <FormField
-                  v-model="data.identification.number"
-                  label="Número de Identificación"
-                  icon="mdi:card-account-details-outline"
-                  placeholder="Número de identificación"
-                  required
-                  :disabled="!data.identification.type"
-                  @input="handleIdentificationNumberInput"
-                  @validation="(isValid) => handleValidation('identificationNumber', isValid)"
-                />
-              </div>
-
               <!-- Nombres -->
               <FormField
-                v-model="data.name.first"
+                v-model="nombres"
                 label="Nombres"
                 icon="mdi:account"
-                placeholder="Ingresa tus Nombres"
+                placeholder="Nombres"
                 required
                 @input="handleNameInput"
                 @validation="(isValid) => handleValidation('firstName', isValid)"
@@ -52,10 +23,10 @@
 
               <!-- Apellidos -->
               <FormField
-                v-model="data.name.last"
+                v-model="apellidos"
                 label="Apellidos"
                 icon="mdi:account-outline"
-                placeholder="Ingresa tus Apellidos"
+                placeholder="Apellidos"
                 required
                 @input="handleLastInput"
                 @validation="(isValid) => handleValidation('lastName', isValid)"
@@ -63,7 +34,7 @@
 
               <!-- Correo Electrónico -->
               <FormField
-                v-model="data.contact.email"
+                v-model="data.email"
                 label="Correo Electrónico"
                 icon="mdi:email"
                 placeholder="Email"
@@ -74,15 +45,14 @@
                 errorMessage="Por favor, ingrese un correo electrónico válido"
               />
 
-              <!-- Teléfono celular/whatsapp -->
+              <!-- Rol -->
               <FormField
-                v-model="data.contact.phone"
-                label="Teléfono celular/whatsapp"
-                icon="mdi:phone"
-                placeholder="+593"
-                required
-                @input="handlePhoneInput"
-                @validation="(isValid) => handleValidation('phone', isValid)"
+                v-model="data.rol.name"
+                label="Rol"
+                icon="oui:app-users-roles"
+                readonly
+                disabled
+                @validation="(isValid) => handleValidation('rol', isValid)"
               />
             </form>
           </div>
@@ -93,7 +63,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref, watch, onMounted, nextTick } from 'vue';
 import {
   IonCard,
   IonCardContent,
@@ -103,64 +73,44 @@ import { useInitialData } from "@/composables/useInitialData";
 import {
   allowOnlyLetters,
   validateEmailInRealTime,
-  formatPhoneNumber,
-  formatEcuadorianId
 } from "@/utils/input-controls";
-
-// Definimos la interfaz para las opciones de tipo de ID
-interface TipoIDOpcion {
-  label: string;
-  value: string;
-}
-
-// Array con las opciones de tipo de identificación
-const opcionesTipoID = ref<TipoIDOpcion[]>([
-  { label: 'Cédula', value: 'cedula' },
-  { label: 'RUC', value: 'ruc' }
-]);
 
 // Valores iniciales para el formulario
 const initialValues = {
-  identification: {
-    type: '',
-    number: ''
-  },
-  name: {
-    first: '',
-    last: ''
-  },
-  contact: {
-    email: '',
-    phone: ''
+  name: "",
+  email: "",
+  base64: "",
+  rol: {
+    id: "9de79ed8-b4f0-48bb-ab5d-6caca8a454ed",
+    name: "Administrador",
+    is_main: true,
+    description: null
   }
 };
 
 // Usar el composable useInitialData para manejar los datos
-const { data } = useInitialData(
-  "personalInfo",
+const { data, updateField } = useInitialData(
+  "createUser",
   initialValues,
   {
     autoSave: true,
-    debug: false,
-    nestedFields: {
-      identification: ["type", "number"],
-      name: ["first", "last"],
-      contact: ["email", "phone"]
-    }
+    debug: true // Activar debug para ver los logs
   }
 );
 
+// Variables locales para nombres y apellidos
+const nombres = ref("");
+const apellidos = ref("");
+
 // Definir un tipo para las claves de validación
-type ValidationKey = 'identificationType' | 'identificationNumber' | 'firstName' | 'lastName' | 'email' | 'phone';
+type ValidationKey = 'firstName' | 'lastName' | 'email' | 'rol';
 
 // Estado para validación de campos con tipo explícito
 const validationState = ref<Record<ValidationKey, boolean>>({
-  identificationType: true,
-  identificationNumber: true,
   firstName: true,
   lastName: true,
   email: true,
-  phone: true
+  rol: true
 });
 
 // Función para manejar eventos de validación con tipos correctos
@@ -168,39 +118,38 @@ const handleValidation = (field: ValidationKey, isValid: boolean) => {
   validationState.value[field] = isValid;
 };
 
-// Manejador de input para el número de identificación que aplica validación según el tipo seleccionado
-const handleIdentificationNumberInput = (event: Event) => {
-  // Aplicar diferentes validaciones según el tipo de identificación seleccionado
-  if (data.value.identification.type === 'ruc') {
-    // Si es RUC, usar formatEcuadorianId
-    data.value.identification.number = formatEcuadorianId(event);
-  } else if (data.value.identification.type === 'cedula') {
-    // Si es Cédula, usar formatPhoneNumber
-    data.value.identification.number = formatPhoneNumber(event);
-  } else {
-    // Si no hay tipo seleccionado o es otro tipo, permitir solo números
-    const input = event.target as HTMLInputElement;
-    data.value.identification.number = input.value.replace(/\D/g, '');
-  }
+// Función para actualizar el nombre completo
+const updateFullName = () => {
+  // Concatenar nombres y apellidos con un espacio entre ellos
+  const fullName = `${nombres.value} ${apellidos.value}`.trim();
+  
+  // Actualizar el campo name en el objeto data
+  updateField('name', fullName);
+  
+  console.log("Nombre completo actualizado:", fullName);
 };
 
 // Manejadores de eventos para los inputs con validación
 const handleNameInput = (event: Event) => {
-  data.value.name.first = allowOnlyLetters(event);
+  nombres.value = allowOnlyLetters(event);
+  // Actualizar el nombre completo después de cambiar el nombre
+  nextTick(() => {
+    updateFullName();
+  });
 };
 
 const handleLastInput = (event: Event) => {
-  data.value.name.last = allowOnlyLetters(event);
-};
-
-const handlePhoneInput = (event: Event) => {
-  data.value.contact.phone = formatPhoneNumber(event);
+  apellidos.value = allowOnlyLetters(event);
+  // Actualizar el nombre completo después de cambiar el apellido
+  nextTick(() => {
+    updateFullName();
+  });
 };
 
 const handleEmailInput = (event: Event) => {
   // Usar la función de validación en tiempo real
   const result = validateEmailInRealTime(event);
-  data.value.contact.email = result.value;
+  updateField('email', result.value);
   handleValidation('email', result.isValid);
 };
 
@@ -209,15 +158,40 @@ const validateEmailInput = (event: Event) => {
   return validateEmailInRealTime(event);
 };
 
-// Watch para limpiar el número de identificación si cambia el tipo
-watch(() => data.value.identification.type, () => {
-  // Limpiar el número de identificación cuando cambia el tipo
-  data.value.identification.number = '';
+// Inicializar nombres y apellidos si ya existe un nombre completo
+onMounted(() => {
+  const initializeNames = () => {
+    if (data.value.name) {
+      const nameParts = data.value.name.split(' ');
+      if (nameParts.length > 1) {
+        // El último elemento es el apellido, el resto son nombres
+        apellidos.value = nameParts.pop() || '';
+        nombres.value = nameParts.join(' ');
+      } else if (nameParts.length === 1) {
+        nombres.value = nameParts[0];
+      }
+      
+      console.log("Inicializado con:", {
+        nombreCompleto: data.value.name,
+        nombres: nombres.value,
+        apellidos: apellidos.value
+      });
+    }
+  };
+
+  initializeNames();
 });
+
+// Observar cambios en nombres y apellidos para actualizar el nombre completo
+watch([nombres, apellidos], () => {
+  if (nombres.value || apellidos.value) {
+    updateFullName();
+  }
+}, { immediate: true });
 </script>
 
 <style scoped>
-/* Configuración del ancho fijo para pantallas grandes */
+/* Los estilos se mantienen igual */
 .main-container {
   width: 100%;
   max-width: 100%;
@@ -257,13 +231,27 @@ watch(() => data.value.identification.type, () => {
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
+/* Contenedor del encabezado */
+.header-container {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  padding-bottom: 10px;
+}
+
 /* Título de sección */
 .section-title {
   font-size: 1.1rem;
   font-weight: 600;
   color: #333;
-  padding-bottom: 10px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  margin-bottom: 5px;
+}
+
+/* Subtítulo de sección */
+.section-subtitle {
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: #666;
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 /* Contenedor del formulario */

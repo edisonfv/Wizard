@@ -315,7 +315,7 @@ const getPaymentMethodName = (methodValue: string): string => {
 }
 
 .item-value.highlight {
-  color: #1a56db; /* Azul principal */
+  color: #1f2937; /* Azul principal */
   font-size: 0.95rem;
 }
 
