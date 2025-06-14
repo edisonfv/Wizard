@@ -2,14 +2,24 @@
   <div class="w-full flex justify-center">
     <ion-card class="wizard-card main-container">
       <ion-card-content class="wizard-content">
-        <div class="section-container">
+        <div class="section-container" ref="billSectionParent">
           <div class="header-container">
-            <h4 class="section-title">Creación de usuario</h4>
-            <h5 class="section-subtitle">Completa los datos del cliente para crear su usuario</h5>
+            <h4 class="section-title">Datos Personales</h4>
+            <h5 class="section-subtitle">Completa los datos personales del cliente</h5>
           </div>
-          
           <div class="w-full">
             <form @submit.prevent class="form-container">
+              <!-- Cédula -->
+              <FormField
+                v-model="data.cedula"
+                label="Cédula"
+                icon="mdi:card-account-details"
+                placeholder="Cédula"
+                required
+                @input="handleCedulaInput"
+                @validation="(isValid) => handleValidation('cedula', isValid)"
+              />
+
               <!-- Nombres -->
               <FormField
                 v-model="nombres"
@@ -44,17 +54,11 @@
                 :validator="validateEmailInput"
                 errorMessage="Por favor, ingrese un correo electrónico válido"
               />
-
-              <!-- Rol -->
-              <FormField
-                v-model="data.rol.name"
-                label="Rol"
-                icon="oui:app-users-roles"
-                readonly
-                disabled
-                @validation="(isValid) => handleValidation('rol', isValid)"
-              />
             </form>
+          </div>
+          <!-- Mostrar formulario de facturación si el email es válido -->
+          <div v-if="validationState.email && data.email">
+            <BillDataForm ref="billDataFormRef" />
           </div>
         </div>
       </ion-card-content>
@@ -64,6 +68,7 @@
 
 <script setup lang="ts">
 import { ref, watch, onMounted, nextTick } from 'vue';
+import autoAnimate from '@formkit/auto-animate';
 import {
   IonCard,
   IonCardContent,
@@ -74,12 +79,14 @@ import {
   allowOnlyLetters,
   validateEmailInRealTime,
 } from "@/utils/input-controls";
+import BillDataForm from './billData.vue';
 
 // Valores iniciales para el formulario
 const initialValues = {
   name: "",
   email: "",
   base64: "",
+  cedula: "",
   rol: {
     id: "9de79ed8-b4f0-48bb-ab5d-6caca8a454ed",
     name: "Administrador",
@@ -101,16 +108,19 @@ const { data, updateField } = useInitialData(
 // Variables locales para nombres y apellidos
 const nombres = ref("");
 const apellidos = ref("");
+const billDataFormRef = ref<any>(null);
+const billSectionParent = ref<HTMLElement | null>(null);
 
 // Definir un tipo para las claves de validación
-type ValidationKey = 'firstName' | 'lastName' | 'email' | 'rol';
+type ValidationKey = 'firstName' | 'lastName' | 'email' | 'rol' | 'cedula';
 
 // Estado para validación de campos con tipo explícito
 const validationState = ref<Record<ValidationKey, boolean>>({
   firstName: true,
   lastName: true,
   email: true,
-  rol: true
+  rol: true,
+  cedula: true
 });
 
 // Función para manejar eventos de validación con tipos correctos
@@ -153,6 +163,13 @@ const handleEmailInput = (event: Event) => {
   handleValidation('email', result.isValid);
 };
 
+const handleCedulaInput = (event: Event) => {
+  const target = event.target as HTMLInputElement | null;
+  const cedulaValue = target?.value ?? '';
+  updateField('cedula', cedulaValue);
+  handleValidation('cedula', cedulaValue.length > 0);
+};
+
 // Función de validación para el email que devuelve un objeto con value e isValid
 const validateEmailInput = (event: Event) => {
   return validateEmailInRealTime(event);
@@ -180,6 +197,12 @@ onMounted(() => {
   };
 
   initializeNames();
+  if (billSectionParent.value) {
+    autoAnimate(billSectionParent.value, {
+      duration: 900,
+      easing: 'cubic-bezier(0.22, 1, 0.36, 1)'
+    });
+  }
 });
 
 // Observar cambios en nombres y apellidos para actualizar el nombre completo
@@ -188,6 +211,21 @@ watch([nombres, apellidos], () => {
     updateFullName();
   }
 }, { immediate: true });
+
+watch(
+  () => validationState.value.email && data.value.email,
+  (showBillData) => {
+    if (showBillData) {
+      nextTick(() => {
+        // Scroll al formulario de facturación
+        const el = billDataFormRef.value?.billDataRef;
+        if (el && el.scrollIntoView) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    }
+  }
+);
 </script>
 
 <style scoped>

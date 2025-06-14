@@ -45,7 +45,7 @@ export function useWizardNavigation(
   
   // Definir los pasos comunes a todos los tipos de wizard
   const commonSteps: WizardStep[] = [
-    { label: "Creacion de Usuario", key: "personal-info" },
+    { label: "Datos Personales y Facturacion", key: "personal-info" },
     { label: "Configuraciones de la Empresa", key: "config-company" },
     { label: "Datos de la Empresa", key: "create-company" },
   ]
@@ -183,7 +183,7 @@ export function useWizardNavigation(
     // Si el paso actual tiene sub-pasos
     if (hasSubStepsForCurrentStep.value) {
       // Intentamos retroceder al sub-paso anterior
-      const goToPrevStep = prevSubStep(currentStepKey.value)
+      const goToPrevStep = prevSubStep()
       
       // Si estamos en el primer sub-paso, retrocedemos al paso principal anterior
       if (goToPrevStep) {
@@ -267,10 +267,9 @@ export function useWizardNavigation(
 
   /**
    * Retrocede al sub-paso anterior
-   * @param stepKey Clave del paso principal
    * @returns true si se debe ir al paso principal anterior, false en caso contrario
    */
-  const prevSubStep = (stepKey: string): boolean => {
+  const prevSubStep = (): boolean => {
     // Si no estamos en el primer sub-paso, retrocedemos
     if (currentSubStepIndex.value > 0) {
       currentSubStepIndex.value--

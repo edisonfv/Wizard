@@ -83,6 +83,33 @@
       </div>
     </div>
 
+    <!-- Input Comprobante de Pago -->
+    <div class="relative flex flex-col  my-2.5 w-full">
+      <label for="proofPayment" class="text-gray-700 font-medium mb-1">
+        Comprobante de pago <span class="required">*</span>
+      </label>
+      <div class="relative w-full">
+        <div class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+          <Icon icon="f7:number" width="20" height="20" />
+        </div>
+        <input
+          id="proofPayment"
+          type="text"
+          placeholder="Ingresa el número de comprobante"
+          v-model="data.payment.datafastData.proofPayment"
+          required
+          @input="handleProofPaymentInput"
+          class="w-full p-3 pl-12 bg-white text-gray-900 border border-gray-300 rounded-lg outline-none transition-all duration-300 hover:border-blue-400"
+          :class="{
+            'bg-primary-50 border-primary ': data.payment.datafastData.proofPayment && data.payment.datafastData.proofPayment.length > 0,
+            'border-blue-500 border-2 shadow-md': focusedField === 'proofPayment'
+          }"
+          @focus="setFocus('proofPayment')"
+          @blur="clearFocus"
+        />
+      </div>
+    </div>
+
     <!-- Input del lote -->
     <div class="relative flex flex-col  my-2.5 w-full">
       <label for="numberLote" class="text-gray-700 font-medium mb-1">
@@ -150,7 +177,8 @@ const initialValues = {
     amount: 0,
     datafastData: {
       typeCard: "",
-      numberLote: ""
+      numberLote: "",
+      proofPayment: ""
     }
   }
 };
@@ -183,7 +211,11 @@ const handleNumberLoteInput = (event: Event) => {
 data.value.payment.datafastData.numberLote = allowOnlyNumericCharacters(event);
 };
 
-// Asegurar que la fecha actual se cargue al montar el componente
+const handleProofPaymentInput = (event: Event) => {
+  data.value.payment.datafastData.proofPayment = allowOnlyNumericCharacters(event);
+};
+
+// Asegurar que la fecha current se cargue al montar el componente
 onMounted(() => {
   // Si no hay fecha establecida, establecer la fecha actual
   if (!data.value.payment.date) {

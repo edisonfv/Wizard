@@ -19,6 +19,7 @@
     "@capacitor/haptics": "7.0.1",
     "@capacitor/keyboard": "7.0.1",
     "@capacitor/status-bar": "7.0.1",
+    "@formkit/auto-animate": "^0.8.2",
     "@iconify/vue": "^4.3.0",
     "@ionic/vue": "^8.5.3",
     "@ionic/vue-router": "^8.5.3",

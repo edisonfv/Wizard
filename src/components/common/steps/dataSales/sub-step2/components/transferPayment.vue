@@ -109,6 +109,33 @@
         />
       </div>
     </div>
+
+    <!-- Input Número de Lote -->
+    <div class="relative flex flex-col  my-2.5 w-full">
+      <label for="numberLote" class="text-gray-700 font-medium mb-1">
+        Número de Lote <span class="required">*</span>
+      </label>
+      <div class="relative w-full">
+        <div class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+          <Icon icon="f7:number" width="20" height="20" />
+        </div>
+        <input
+          id="numberLote"
+          type="text"
+          placeholder="Ingresa el número de lote"
+          v-model="data.payment.transferData.numberLote"
+          required
+          @input="handleNumberLoteInput"
+          class="w-full p-3 pl-12 bg-white text-gray-900 border border-gray-300 rounded-lg outline-none transition-all duration-300 hover:border-blue-400"
+          :class="{
+            'bg-primary-50 border-primary ': data.payment.transferData.numberLote && data.payment.transferData.numberLote.length > 0,
+            'border-blue-500 border-2 shadow-md': focusedField === 'numberLote'
+          }"
+          @focus="setFocus('numberLote')"
+          @blur="clearFocus"
+        />
+      </div>
+    </div>
   </form>
 </template>
 
@@ -150,7 +177,8 @@ const initialValues = {
     amount: 0,
     transferData: {
       financialInstitution: "",
-      proofPayment: ""
+      proofPayment: "",
+      numberLote: ""
     }
   }
 };
@@ -181,6 +209,10 @@ const handleFinancialInstitutionInput = (event: Event) => {
 
 const handleProofPaymentInput = (event: Event) => {
   data.value.payment.transferData.proofPayment = allowOnlyNumericCharacters(event);
+};
+
+const handleNumberLoteInput = (event: Event) => {
+  data.value.payment.transferData.numberLote = allowOnlyNumericCharacters(event);
 };
 
 // Asegurar que la fecha actual se cargue al montar el componente
