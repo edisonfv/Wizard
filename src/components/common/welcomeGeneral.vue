@@ -34,9 +34,12 @@
             
             <!-- Indicación para continuar con mejor contraste y visibilidad -->
             <div class="cta-container">
-              <p class="cta-text">
-                Haz clic en el botón para comenzar la configuración
-              </p>
+              <div class="cta-content">
+                <Icon icon="mdi:information-outline" class="info-icon" />
+                <p class="cta-text">
+                  Haz clic en el botón para comenzar la configuración
+                </p>
+              </div>
             </div>
 
             <!-- Botón Comenzar con mejor accesibilidad y feedback visual -->
@@ -60,6 +63,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { IonContent, IonButton } from '@ionic/vue';
+import {Icon} from '@iconify/vue'
 
 // Estado para controlar las animaciones
 const isAnimated = ref(false);
@@ -239,11 +243,32 @@ const onStartClick = () => {
   opacity: 1;
   transform: translateY(0);
 }
+
+/* Contenedor para el icono y texto con alineación perfecta */
+.cta-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+/* Icono de información mejorado */
+.info-icon {
+  width: 1.125rem;
+  height: 1.125rem;
+  color: var(--ion-color-primary);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
   
 .cta-text {
   font-size: 1rem;
   color: var(--ion-color-primary);
   font-weight: 500;
+  margin: 0;
+  line-height: 1.5;
 }
   
 /* Botón de comenzar con mejor feedback visual */
@@ -299,6 +324,11 @@ const onStartClick = () => {
   .cta-text {
     font-size: 0.9rem;
   }
+
+  .info-icon {
+    width: 1rem;
+    height: 1rem;
+  }
     
   .card-content {
     padding: 1.75rem 1.5rem;
@@ -316,6 +346,15 @@ const onStartClick = () => {
     
   .description-text {
     font-size: 0.9rem;
+  }
+
+  .cta-text {
+    font-size: 0.85rem;
+  }
+
+  .info-icon {
+    width: 0.9rem;
+    height: 0.9rem;
   }
     
   .card-content {
