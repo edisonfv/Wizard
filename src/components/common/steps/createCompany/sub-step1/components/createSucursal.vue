@@ -50,7 +50,7 @@
       v-model="data.branch.phone"
       label="Teléfono"
       icon="mdi:phone"
-      placeholder="+593"
+      placeholder="Número de telefono"
       required
       @input="handlePhoneInput"
       @validation="(isValid) => handleValidation('phone', isValid)"
