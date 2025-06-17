@@ -5,12 +5,16 @@
       <ion-card class="main-card">
         <ion-card-header class="pb-0">
           <ion-card-title class="card-title">Búsqueda y Validación de RUC</ion-card-title>
+          <div class="info-hint card-subtitle">
+            <Icon icon="mdi:information" width="20" height="20" style="margin-right:6px;" />
+            <span>En caso de no contar con un RUC, seleccione la opción 'Sin RUC' para continuar.</span>
+          </div>
           <ion-card-subtitle class="card-subtitle">
             Ingresa el RUC para verificar si la empresa existe en el sistema          </ion-card-subtitle>
         </ion-card-header>
         
         <ion-card-content class="search-section">
-          <searchRUC @ruc-searched="handleRucSearched" @ruc-not-found="handleRucNotFound" />
+          <searchRUC @ruc-searched="handleRucSearched" @ruc-not-found="handleRucNotFound" @ruc-valid-for-continue="handleRucValidForContinue" />
         </ion-card-content>
       </ion-card>
 
@@ -21,7 +25,7 @@
         </ion-card-header>
         
         <ion-card-content class="info-section">
-          <informationRUC :ruc-data="rucData" :ruc-found="rucFound" />
+          <informationRUC :ruc-data="rucData" :ruc-found="rucFound" :ruc-valid-for-continue="rucValidForContinue" />
         </ion-card-content>
       </ion-card>
     </div>
@@ -31,6 +35,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonCardSubtitle } from '@ionic/vue'
+import { Icon } from '@iconify/vue';
 import searchRUC from "./components/searchRUC.vue";
 import informationRUC from "./components/informationRUC.vue";
 
@@ -38,6 +43,8 @@ import informationRUC from "./components/informationRUC.vue";
 const showRucInfo = ref(false);
 // Estado para controlar si se encontró el RUC
 const rucFound = ref(true);
+// Estado para controlar si el RUC es válido para continuar
+const rucValidForContinue = ref(false);
 
 // Datos del RUC que se pasarán al componente informationRUC
 const rucData = ref({
@@ -52,6 +59,7 @@ const handleRucSearched = (data: any) => {
   rucData.value = data;
   // Indicar que se encontró el RUC
   rucFound.value = true;
+  rucValidForContinue.value = false;
   // Mostrar el componente informationRUC
   showRucInfo.value = true;
 };
@@ -66,6 +74,22 @@ const handleRucNotFound = (rucNumber: string) => {
   };
   // Indicar que NO se encontró el RUC
   rucFound.value = false;
+  rucValidForContinue.value = false;
+  // Mostrar el componente informationRUC con mensaje de error
+  showRucInfo.value = true;
+};
+
+// Función que se ejecuta cuando el RUC es válido para continuar
+const handleRucValidForContinue = (rucNumber: string) => {
+  // Actualizar los datos del RUC con información mínima
+  rucData.value = {
+    ruc: rucNumber,
+    razonSocial: '',
+    estado: ''
+  };
+  // Indicar que NO se encontró el RUC
+  rucFound.value = false;
+  rucValidForContinue.value = true;
   // Mostrar el componente informationRUC con mensaje de error
   showRucInfo.value = true;
 };
@@ -153,5 +177,13 @@ const handleRucNotFound = (rucNumber: string) => {
   .card-title {
     font-size: 1.1rem;
   }
+}
+
+.info-hint {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 8px 0 0 0;
+  /* Hereda color y tamaño de card-subtitle */
 }
 </style>

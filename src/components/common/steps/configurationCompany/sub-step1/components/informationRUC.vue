@@ -1,7 +1,18 @@
 <template>
   <div class="information-ruc-container">
-    <!-- Mensaje de error cuando no se encuentra el RUC -->
-    <div v-if="!rucFound" class="error-message">
+    <!-- Mensaje de éxito cuando el RUC no existe pero es válido para continuar -->
+    <div v-if="rucValidForContinue" class="success-message">
+      <Icon icon="mdi:check-circle" class="success-icon" />
+      <div class="success-content">
+        <h5 class="success-title">RUC válido para continuar</h5>
+        <p class="success-description">
+          El RUC <strong>{{ rucData.ruc }}</strong> no existe en el sistema, pero es válido para continuar con el registro.
+        </p>
+      </div>
+    </div>
+
+    <!-- Mensaje de error cuando no se encuentra el RUC y no es válido para continuar -->
+    <div v-else-if="!rucFound" class="error-message">
       <Icon icon="mdi:alert-circle" class="error-icon" />
       <div class="error-content">
         <h5 class="error-title">RUC no encontrado</h5>
@@ -69,6 +80,7 @@ interface RucData {
 defineProps<{
   rucData: RucData;
   rucFound: boolean;
+  rucValidForContinue?: boolean;
 }>();
 </script>
 
@@ -202,6 +214,42 @@ defineProps<{
 
 .error-suggestion {
   color: #666;
+}
+
+/* Estilos para el mensaje de éxito */
+.success-message {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background-color: rgba(34, 197, 94, 0.1);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.success-icon {
+  color: #22c55e;
+  font-size: 24px;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.success-content {
+  flex: 1;
+}
+
+.success-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #22c55e;
+  margin: 0 0 8px 0;
+}
+
+.success-description {
+  margin: 0;
+  color: #333;
+  font-size: 0.9rem;
+  line-height: 1.4;
 }
 
 /* Estilos responsivos */

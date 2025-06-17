@@ -21,6 +21,14 @@
           <span v-if="!isLoading">Consultar</span>
           <ion-spinner v-else name="crescent" class="spinner-button"></ion-spinner>
         </ion-button>
+        <button
+          class="toggle-sin-ruc"
+          :class="{ active: sinRucActive }"
+          @click="toggleSinRuc"
+          type="button"
+        >
+          Sin RUC
+        </button>
       </div>
     </ion-item>
     
@@ -29,6 +37,8 @@
       <Icon icon="mdi:alert-circle-outline" class="validation-error-icon" />
       <span>{{ validationError }}</span>
     </div>
+    <!-- Mensaje de éxito de validación -->
+    <!-- Eliminado: successMessage no existe -->
 
     <!-- Modal para empresa existente (MEJORADO) -->
       
@@ -84,6 +94,7 @@ import { IonItem, IonButton, IonSpinner, IonModal } from "@ionic/vue"
 import { Icon } from "@iconify/vue"
 import { useInitialData } from "@/composables/useInitialData"
 import { useWizardStore } from "@/stores/wizardStore"
+import { useToast } from 'vue-toastification';
 
 // Obtener instancia del store
 const wizardStore = useWizardStore()
@@ -239,6 +250,7 @@ const isFocused = ref(false)
 const rucInput = ref<HTMLInputElement | null>(null)
 const isLoading = ref(false)
 const validationError = ref("")
+// Eliminada la variable successMessage
 const rucIsValid = ref(false) // Variable para controlar la validez del RUC
 
 // Estado para el modal de empresa existente
@@ -250,8 +262,12 @@ const existingCompany = ref({
   frequencyType: ""
 })
 
+// Estado para el toggle "Sin RUC"
+const sinRucActive = ref(false)
+const toast = useToast();
+
 // Definir los eventos que este componente puede emitir
-const emit = defineEmits(["ruc-searched", "ruc-not-found"])
+const emit = defineEmits(["ruc-searched", "ruc-not-found", "ruc-valid-for-continue"])
 
 // Inicializar rucIsValid en el montaje del componente
 onMounted(() => {
@@ -351,31 +367,31 @@ const updateStoreWithSRIData = (data: any) => {
 }
 
 const searchRuc = async () => {
-  // Limpiar mensaje de error previo
+  // Limpiar mensajes previos
   validationError.value = ""
   rucIsValid.value = false // Reset del estado de validación
-  
+
   // Validar que se haya ingresado un RUC
   if (!rucValue.value) {
     validationError.value = "Por favor, ingresa un número de RUC"
     return
   }
-  
+
   // Validar el formato del RUC
   if (!validateRuc(rucValue.value)) {
     return
   }
-  
+
   // Simular carga
   isLoading.value = true
-  
+
   try {
     // Simular una petición a un servidor (esperar 1 segundo)
     await new Promise(resolve => setTimeout(resolve, 1000))
-    
+
     // Verificar si la empresa ya existe en nuestra base de datos simulada
     const existingCompanyData = checkExistingCompany(rucValue.value)
-    
+
     if (existingCompanyData) {
       console.log("Empresa ya existente:", existingCompanyData)
       
@@ -389,12 +405,19 @@ const searchRuc = async () => {
       
       // Mostrar el modal
       showExistingCompanyModal.value = true
-      
-      // No continuamos con la búsqueda en la base de datos del SRI
       isLoading.value = false
       return
     }
-    
+
+    // Si el toggle Sin RUC está activo
+    if (sinRucActive.value) {
+      // Emitir evento especial para indicar que el RUC no existe pero es válido para continuar
+      rucIsValid.value = true;
+      emit("ruc-valid-for-continue", rucValue.value);
+      isLoading.value = false;
+      return;
+    }
+
     // Si no existe, buscar el RUC en la base de datos simulada del SRI
     const foundRuc = findRucInDatabase(rucValue.value)
     
@@ -437,6 +460,15 @@ const searchRuc = async () => {
     rucIsValid.value = false
   } finally {
     isLoading.value = false
+  }
+}
+
+const toggleSinRuc = () => {
+  sinRucActive.value = !sinRucActive.value;
+  if (sinRucActive.value) {
+    toast.success('Modo "Sin RUC" activado.');
+  } else {
+    toast.info('Modo "Sin RUC" desactivado.');
   }
 }
 </script>
@@ -566,6 +598,23 @@ const searchRuc = async () => {
 
 .validation-error-icon {
   font-size: 16px;
+}
+
+.validation-success {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 0 4px;
+  color: #22c55e;
+  background: #e7f9ef;
+  border-radius: 6px;
+  font-size: 0.85rem;
+}
+
+.validation-success-icon {
+  font-size: 16px;
+  color: #22c55e;
 }
 
 /* NUEVOS ESTILOS MEJORADOS PARA EL MODAL */
@@ -710,6 +759,30 @@ const searchRuc = async () => {
   --background: var(--ion-color-primary-shade);
   box-shadow: 0 6px 16px rgba(var(--ion-color-primary-rgb), 0.3);
   transform: translateY(-2px);
+}
+
+/* NUEVOS ESTILOS PARA EL TOGGLE "SIN RUC" */
+.toggle-sin-ruc {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 16px;
+  height: 40px;
+  border-radius: 8px;
+  border: 2px solid #0054e9;
+  background: #fff;
+  color: #222;
+  font-weight: 500;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  user-select: none;
+}
+
+.toggle-sin-ruc.active {
+  border-color: #10b981;
+  background: #10b981;
+  color: #fff;
 }
 
 /* Estilos responsivos */

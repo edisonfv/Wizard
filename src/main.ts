@@ -25,8 +25,10 @@ import "@ionic/vue/css/display.css"
 import "@/assets/styles.css"
 
 import { VueQueryPlugin } from "@tanstack/vue-query"
+import Toast from 'vue-toastification';
+import 'vue-toastification/dist/index.css';
 
-// Creamos la instancia de Pinia
+/* Creamos la instancia de Pinia */
 const pinia = createPinia()
 
 const app = createApp(App)
@@ -41,6 +43,18 @@ const app = createApp(App)
         },
       },
     },
+  })
+  .use(Toast, {
+    position: 'top-right',
+    timeout: 2000,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    showCloseButtonOnHover: false,
+    hideProgressBar: true,
+    closeButton: false,
+    icon: true,
+    rtl: false
   })
 
 router.isReady().then(() => {
