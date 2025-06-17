@@ -17,7 +17,8 @@
       icon="mdi:barcode"
       placeholder="Código del punto de Emisión"
       required
-      disabled
+      :readonly="!sinRucActive"
+      :disabled="!sinRucActive"
       @validation="(isValid) => handleValidation('idPos', isValid)"
     />
   </form>
@@ -27,11 +28,12 @@
 import { ref, onMounted } from 'vue';
 import FormField from "@/components/ui/FormField.vue";
 import { useInitialData } from "@/composables/useInitialData";
+import { useWizardStore } from "@/stores/wizardStore";
 
 // Valores iniciales para el formulario
 const initialValues = {
   pointOfSale: {
-    idPos: '010',
+    idPos: '',
     name: ''
   }
 };
@@ -66,9 +68,12 @@ const handleValidation = (field: ValidationKey, isValid: boolean) => {
 // Asegurar que el valor '010' se establezca al montar el componente
 onMounted(() => {
   if (!data.value.pointOfSale.idPos) {
-    data.value.pointOfSale.idPos = '010';
+    data.value.pointOfSale.idPos = '';
   }
 });
+
+const wizardStore = useWizardStore();
+const sinRucActive = wizardStore.wizardState?.sinRucActive || false;
 </script>
 
 <style scoped>

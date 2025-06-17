@@ -1,5 +1,8 @@
 <template>
   <form @submit.prevent class="form-container">
+    <!-- Título para datos de la matriz -->
+    <h4 class="subsection-title">Datos de la Matriz</h4>
+
     <!-- Nombre Comercial y Código de Sucursal en la misma fila -->
     <div class="form-row">
       <!-- Nombre Comercial -->
@@ -19,8 +22,8 @@
         icon="mdi:barcode"
         placeholder="Código de la matriz"
         required
-        readonly
-        disabled
+        :readonly="!sinRucActive"
+        :disabled="!sinRucActive"
         @validation="(isValid) => handleValidation('idBranch', isValid)"
       />
     </div>
@@ -79,6 +82,7 @@ import {
   formatPhoneNumber,
   validateEmailInRealTime
 } from "@/utils/input-controls";
+import { useWizardStore } from "@/stores/wizardStore";
 
 // Valores iniciales para el formulario
 const initialValues = {
@@ -143,12 +147,24 @@ const handleEmailInput = (event: Event) => {
 const validateEmailInput = (event: Event) => {
   return validateEmailInRealTime(event);
 };
+
+const wizardStore = useWizardStore();
+const sinRucActive = wizardStore.wizardState?.sinRucActive || false;
 </script>
 
 <style scoped>
 /* Contenedor del formulario */
 .form-container {
   width: 100%;
+}
+
+/* Título de subsección */
+.subsection-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 15px;
+  padding-bottom: 0;
 }
 
 /* Fila de formulario para elementos en línea */

@@ -4,8 +4,9 @@
       <!-- Contenedor principal centrado con ancho controlado -->
       <div class="centered-container">
         <div class="unified-form-container">
-          <h4 class="section-title">Datos de la Empresa y Matriz</h4>
-          
+          <h4 class="section-title">Datos Informativos de la Empresa</h4>
+          <!-- Subtítulo para datos de la empresa -->
+          <h4 class="subsection-title">Datos de la Empresa</h4>
           <!-- Formulario unificado -->
           <div class="form-wrapper">
             <!-- Componente createCompany -->
@@ -94,6 +95,19 @@ import createCompany from "@/components/common/steps/createCompany/sub-step1/com
   font-weight: 600;
   color: #333;
   margin-bottom: 15px;
+  padding-bottom: 0;
+  /* Igual que el título de sección */
+}
+
+/* Ajuste para subtítulos dentro del formulario (como Datos de la Matriz y Datos de la Empresa) */
+.create-sucursal-form .subsection-title,
+.create-company-form .subsection-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #222;
+  margin-bottom: 8px;
+  margin-top: 10px;
+  padding-bottom: 0;
 }
 
 /* Estilos responsivos */

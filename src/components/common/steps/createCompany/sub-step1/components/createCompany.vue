@@ -9,8 +9,8 @@
         icon="mdi:file-document-outline"
         placeholder="Número de RUC"
         required
-        readonly
-        disabled
+        :readonly="!sinRucActive"
+        :disabled="!sinRucActive"
         @validation="(isValid) => handleValidation('ruc', isValid)"
       />
       
@@ -21,8 +21,8 @@
         icon="mdi:domain"
         placeholder="Razón social de la empresa"
         required
-        readonly
-        disabled
+        :readonly="!sinRucActive"
+        :disabled="!sinRucActive"
         @validation="(isValid) => handleValidation('legalName', isValid)"
       />
     </div>
@@ -36,6 +36,7 @@ import FormField from "@/components/ui/FormField.vue";
 import { useInitialData } from "@/composables/useInitialData";
 import { 
 } from "@/utils/input-controls";
+import { useWizardStore } from "@/stores/wizardStore";
 
 // Valores iniciales para el formulario
 const initialValues = {
@@ -74,6 +75,9 @@ const validationState = ref<Record<ValidationKey, boolean>>({
 const handleValidation = (field: ValidationKey, isValid: boolean) => {
   validationState.value[field] = isValid;
 };
+
+const wizardStore = useWizardStore();
+const sinRucActive = wizardStore.wizardState?.sinRucActive || false;
 
 </script>
 
