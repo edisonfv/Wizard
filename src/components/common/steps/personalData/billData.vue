@@ -115,7 +115,7 @@ const initialValues = {
 
 // Usar el composable useInitialData para manejar los datos
 const { data, updateField } = useInitialData(
-  "createUser",
+  "billUser", // Cambiado para que sea independiente de personalData.vue
   initialValues,
   {
     autoSave: true,
@@ -226,7 +226,13 @@ watch([nombres, apellidos], () => {
 }, { immediate: true });
 
 const billDataRef = ref<HTMLElement | null>(null);
-defineExpose({ billDataRef });
+defineExpose({
+  billDataRef,
+  data,
+  updateField,
+  setNombres: (val: string) => { nombres.value = val; },
+  setApellidos: (val: string) => { apellidos.value = val; }
+});
 </script>
 
 <style scoped>
