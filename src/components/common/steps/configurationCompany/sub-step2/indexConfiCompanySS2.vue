@@ -12,9 +12,9 @@
               <b>Datos informativos <span class="text-blue-700 pl-1">*</span></b>
             </h3>
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <regimeRUC :form-data="formData" />
-              <categoryRUC :form-data="formData" />
-              <agentRUC :form-data="formData" />
+              <regimeRUC :form-data="formData" :editable="sinRucActive" @update="updateFormData" />
+              <categoryRUC :form-data="formData" :editable="sinRucActive" @update="updateFormData" />
+              <agentRUC :form-data="formData" :editable="sinRucActive" @update="updateFormData" />
             </div>
           </div>
 
@@ -77,8 +77,8 @@ import { useWizardStore } from "@/stores/wizardStore";
 // Obtener la instancia del store
 const wizardStore = useWizardStore();
 
-// Definir un tipo para el objeto formData que incluya todas las propiedades necesarias
-interface FormDataType {
+// Detectar si se seleccionó Sin RUC en el paso anterior
+type FormDataType = {
   defaultDocument: string;
   searchParameter: string;
   regimeRUC: string;
@@ -99,7 +99,7 @@ interface FormDataType {
     [key: string]: any; // Para otras propiedades de branch
   };
   [key: string]: any; // Para permitir acceso dinámico a otras propiedades
-}
+};
 
 // Estado local para el formulario completo con valores por defecto
 const formData = ref<FormDataType>({
@@ -123,24 +123,25 @@ const formData = ref<FormDataType>({
   }
 });
 
+const sinRucActive = ref(false);
+
 // Función tipada para actualizar el estado local del formulario
 const updateFormData = (section: string, data: Record<string, any>) => {
-  if (section === "root") {
-    // Actualizar propiedades de nivel raíz
+  // Si la actualización viene de un campo raíz (como regimeRUC o categoryRUC), forzar siempre 'root'
+  if (['regimeRUC', 'categoryRUC'].includes(section)) {
+    (formData.value as any)[section] = data;
+  } else if (section === 'taxAgent') {
+    formData.value.taxAgent = { ...formData.value.taxAgent, ...data };
+  } else if (section === "root") {
     Object.keys(data).forEach(key => {
-      // Usamos una aserción de tipo para indicar a TypeScript que esta operación es segura
       (formData.value as any)[key] = data[key];
     });
   } else if (section in formData.value) {
-    // Actualizar secciones anidadas
-    // Usamos una aserción de tipo para indicar a TypeScript que esta operación es segura
     const sectionData = (formData.value as any)[section];
     (formData.value as any)[section] = { ...sectionData, ...data };
   }
-  
   // Guardar en el store inmediatamente después de cada actualización
   saveFormToStore();
-  
   console.log("Estado local actualizado:", JSON.parse(JSON.stringify(formData.value)));
 };
 
@@ -194,6 +195,16 @@ onMounted(() => {
     };
   }
   
+  // Detectar si se seleccionó Sin RUC en el paso anterior
+  sinRucActive.value = wizardStore.wizardState?.sinRucActive || false;
+
+  if (sinRucActive.value) {
+    // Limpiar los campos informativos
+    formData.value.regimeRUC = '';
+    formData.value.categoryRUC = '';
+    formData.value.taxAgent.isAgent = false;
+  }
+
   // Guardar los valores por defecto en el store inmediatamente después de cargar
   saveFormToStore();
   

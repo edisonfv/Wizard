@@ -465,6 +465,8 @@ const searchRuc = async () => {
 
 const toggleSinRuc = () => {
   sinRucActive.value = !sinRucActive.value;
+  // Guardar el flag en el store para que esté disponible en el paso 2
+  wizardStore.updateWizardState({ sinRucActive: sinRucActive.value });
   if (sinRucActive.value) {
     toast.success('Modo "Sin RUC" activado.');
   } else {

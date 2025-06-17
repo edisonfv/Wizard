@@ -4,6 +4,7 @@ export interface WizardState {
   currentStep: string
   currentSubStep: number
   rucValidated?: boolean // Nueva propiedad para controlar la validación del RUC
+  sinRucActive?: boolean // Permite flag para Sin RUC
 }
 
 // Interfaces para la información personal

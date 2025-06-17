@@ -3,7 +3,13 @@
     <div class="info-label">
       <b>Régimen:</b>
       <div class="info-value">
-        {{ regimeValue }}
+        <template v-if="editable">
+          <input type="text" :value="props.formData.regimeRUC" @input="onInput" class="editable-input" placeholder="" />
+        </template>
+        <template v-else>
+          <span v-if="regimeValue !== ''">{{ regimeValue }}</span>
+          <span v-else>&nbsp;</span>
+        </template>
       </div>
     </div>
   </div>
@@ -12,22 +18,27 @@
 <script setup lang="ts"> 
 import { computed } from 'vue';
 
-// Definir props para recibir datos del componente padre
 const props = defineProps({
   formData: {
     type: Object,
     required: true
+  },
+  editable: {
+    type: Boolean,
+    default: false
   }
 });
+const emit = defineEmits(['update']);
 
-// Computed property para obtener el valor del régimen
+const onInput = (e: Event) => {
+  emit('update', 'regimeRUC', (e.target as HTMLInputElement).value);
+};
+
 const regimeValue = computed(() => {
-  // Verificar si existe la propiedad regimeRUC
   if (props.formData && props.formData.regimeRUC !== undefined) {
-    return props.formData.regimeRUC || 'No especificado';
+    return props.formData.regimeRUC;
   }
-  // Valor por defecto si no existe
-  return 'No especificado';
+  return '';
 });
 </script>
     
@@ -59,5 +70,14 @@ const regimeValue = computed(() => {
   font-weight: 500;
   color: #4b5563;
   padding: 0.25rem 0.25rem;
+}
+
+.editable-input {
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 0.875rem;
+  color: #222;
+  background: #fff;
 }
 </style>

@@ -3,32 +3,34 @@
     <div class="info-label">
       <b>Categoría:</b>
       <div class="info-value">
-        {{ categoryValue }}
+        <template v-if="editable">
+          <input type="text" :value="props.formData.categoryRUC" @input="onInput" class="editable-input" placeholder="" />
+        </template>
+        <template v-else>
+          <span v-if="props.formData.categoryRUC !== ''">{{ props.formData.categoryRUC }}</span>
+          <span v-else>&nbsp;</span>
+        </template>
       </div>
     </div>
   </div>
 </template>
     
 <script setup lang="ts">
-import { computed } from 'vue';
-
-// Definir props para recibir datos del componente padre
 const props = defineProps({
   formData: {
     type: Object,
     required: true
+  },
+  editable: {
+    type: Boolean,
+    default: false
   }
 });
+const emit = defineEmits(['update']);
 
-// Computed property para obtener el valor de la categoría
-const categoryValue = computed(() => {
-  // Verificar si existe la propiedad categoryRUC
-  if (props.formData && props.formData.categoryRUC !== undefined) {
-    return props.formData.categoryRUC || 'No especificada';
-  }
-  // Valor por defecto si no existe
-  return 'No especificada';
-});
+const onInput = (e: Event) => {
+  emit('update', 'categoryRUC', (e.target as HTMLInputElement).value);
+};
 </script>
     
 <style scoped>
@@ -59,5 +61,14 @@ const categoryValue = computed(() => {
   font-weight: 500;
   color: #4b5563;
   padding: 0.25rem 0.25rem;
+}
+
+.editable-input {
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 0.875rem;
+  color: #222;
+  background: #fff;
 }
 </style>

@@ -3,40 +3,41 @@
     <div class="info-label">
       <b>Agente de retención:</b> 
       <div class="info-value">
-        {{ agentValueText }}
+        <template v-if="editable">
+          <select :value="props.formData.taxAgent?.isAgent === undefined ? '' : String(props.formData.taxAgent.isAgent)" @change="onInput" class="editable-input">
+            <option value="">No especificado</option>
+            <option value="true">Sí</option>
+            <option value="false">No</option>
+          </select>
+        </template>
+        <template v-else>
+          <span v-if="props.formData.taxAgent && typeof props.formData.taxAgent.isAgent === 'boolean'">
+            {{ props.formData.taxAgent.isAgent ? 'Sí' : 'No' }}
+          </span>
+          <span v-else>&nbsp;</span>
+        </template>
       </div>
     </div>
   </div>
 </template>
     
 <script setup lang="ts">
-import { computed } from 'vue';
-
-// Definir props para recibir datos del componente padre
 const props = defineProps({
   formData: {
     type: Object,
     required: true
+  },
+  editable: {
+    type: Boolean,
+    default: false
   }
 });
+const emit = defineEmits(['update']);
 
-// Función para convertir el booleano a texto
-const booleanToText = (value: boolean | undefined): string => {
-  if (value === undefined) return 'No especificado';
-  return value ? 'Sí' : 'No';
+const onInput = (e: Event) => {
+  const val = (e.target as HTMLSelectElement).value;
+  emit('update', 'taxAgent', { ...props.formData.taxAgent, isAgent: val === '' ? undefined : val === 'true' });
 };
-
-// Computed property para obtener el texto basado en el valor booleano
-const agentValueText = computed(() => {
-  // Verificar si existe la propiedad taxAgent y isAgent
-  if (props.formData && 
-      props.formData.taxAgent && 
-      typeof props.formData.taxAgent.isAgent === 'boolean') {
-    return booleanToText(props.formData.taxAgent.isAgent);
-  }
-  // Valor por defecto si no existe
-  return booleanToText(false);
-});
 </script>
     
 <style scoped>
@@ -67,5 +68,14 @@ const agentValueText = computed(() => {
   font-weight: 500;
   color: #4b5563;
   padding: 0.25rem 0.25rem;
+}
+
+.editable-input {
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: 0.875rem;
+  color: #222;
+  background: #fff;
 }
 </style>
