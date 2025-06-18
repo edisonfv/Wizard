@@ -1,0 +1,64 @@
+{
+  "data": [
+    {
+      "ruc": "1792780241001",
+      "legalName": "TODONEG S.A.",
+      "status": "ACTIVO",
+      "regimeRUC": "General",
+      "isAgent": true,
+      "accountingRequired": true,
+      "categoryRUC": "Negocio Popular",
+      "idBranch": "001",
+      "commercialName": "Wanqara",
+      "address": "PICHINCHA / QUITO / IÑAQUITO / 10 DE AGOSTO N33-62 Y N33 GUAYANAS"
+    },
+    {
+      "ruc": "1790016919001",
+      "legalName": "CORPORACIÓN FAVORITA C.A.",
+      "status": "ACTIVO",
+      "regimeRUC": "General",
+      "isAgent": true,
+      "accountingRequired": true,
+      "categoryRUC": "Contribuyente Especial",
+      "idBranch": "001",
+      "commercialName": "Supermaxi",
+      "address": "PICHINCHA / QUITO / CUMBAYÁ / AV. INTEROCEÁNICA KM 12.5 Y PASAJE BERMEJO"
+    },
+    {
+      "ruc": "1791251237001",
+      "legalName": "PROCESADORA NACIONAL DE ALIMENTOS C.A. PRONACA",
+      "status": "ACTIVO",
+      "regimeRUC": "General",
+      "isAgent": true,
+      "accountingRequired": true,
+      "categoryRUC": "Contribuyente Especial",
+      "idBranch": "001",
+      "commercialName": "PRONACA",
+      "address": "PICHINCHA / QUITO / TUMBACO / VÍA INTEROCEÁNICA KM 21"
+    },
+    {
+      "ruc": "0992757892001",
+      "legalName": "CORPORACIÓN EL ROSADO S.A.",
+      "status": "ACTIVO",
+      "regimeRUC": "General",
+      "isAgent": true,
+      "accountingRequired": true,
+      "categoryRUC": "Contribuyente Especial",
+      "idBranch": "001",
+      "commercialName": "Mi Comisariato",
+      "address": "GUAYAS / GUAYAQUIL / TARQUI / AV. 9 DE OCTUBRE 729 Y BOYACÁ"
+    },
+    {
+      "ruc": "1791410726001",
+      "legalName": "TECNOMEGA C.A.",
+      "status": "SUSPENDIDO",
+      "regimeRUC": "General",
+      "isAgent": false,
+      "accountingRequired": true,
+      "categoryRUC": "Sociedad",
+      "idBranch": "001",
+      "commercialName": "Tecnomega",
+      "address": "PICHINCHA / QUITO / LA CONCEPCIÓN / AV. REPÚBLICA E2-51 Y ATAHUALPA"
+    }
+  ]
+}

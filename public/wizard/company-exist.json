@@ -1,0 +1,22 @@
+{
+  "data": [
+    {
+      "ruc": "1234567890001",
+      "legalname": "EMPRESA EJEMPLO S.A.",
+      "typePlan": "Plan Premium",
+      "frequencyType": "Mensual"
+    },
+    {
+      "ruc": "0987654321001",
+      "legalname": "CORPORACIÓN TEST C.A.",
+      "typePlan": "Plan Básico",
+      "frequencyType": "Anual"
+    },
+    {
+      "ruc": "1122334455001",
+      "legalname": "SERVICIOS PRUEBA LTDA.",
+      "typePlan": "Plan Pyme",
+      "frequencyType": "Mensual"
+    }
+  ]
+}

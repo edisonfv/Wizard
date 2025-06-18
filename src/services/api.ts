@@ -1,16 +1,5 @@
 import axios from "axios"
 
-// Instancia básica de axios
-const api = axios.create({
-  baseURL: "http://localhost:3001",
-})
-
-// Interfaz básica para los datos del wizard
-interface WizardData {
-  proofPayment: string
-  // Puedes agregar otros campos si los necesitas en el futuro
-}
-
 // Interfaz para los vendedores
 export interface Vendedor {
   id: number
@@ -26,22 +15,30 @@ export interface Plan {
   caracteristicas?: string[]
 }
 
+// Interfaz para las empresas existentes según company-exist.json
+export interface CompanyExist {
+  ruc: string
+  legalname: string
+  typePlan: string
+  frequencyType: string
+}
+
+// Interfaz para los datos de RUC (search-ruc.json)
+export interface RucData {
+  ruc: string
+  legalName: string
+  status: string
+  regimeRUC: string
+  isAgent: boolean
+  accountingRequired: boolean
+  categoryRUC: string
+  idBranch: string
+  commercialName: string
+  address: string
+}
+
 // Servicio simplificado con tipos
 export const wizardService = {
-  // Obtener el comprobante de pago
-  getProofPayment: async (): Promise<string> => {
-    const response = await api.get<WizardData>("/wizardData")
-    return response.data.proofPayment
-  },
-
-  // Actualizar el comprobante de pago
-  updateProofPayment: async (proofPayment: string): Promise<void> => {
-    const response = await api.get<WizardData>("/wizardData")
-    const currentData = response.data
-    const updatedData = { ...currentData, proofPaymanet: proofPayment }
-    await api.put("/wizardData", updatedData)
-  },
-
   // Obtener lista de vendedores
   getVendedores: async (): Promise<Vendedor[]> => {
     const response = await axios.get("/wizard/sallers.json")
@@ -52,5 +49,18 @@ export const wizardService = {
   getPlanes: async (): Promise<Plan[]> => {
     const response = await axios.get("/wizard/plans.json")
     return response.data
-  }
+  },
+
+  // Obtener lista de empresas existentes
+  getCompanyExist: async (): Promise<CompanyExist[]> => {
+    const response = await axios.get("/wizard/company-exist.json")
+    return response.data.data 
+  },
+
+  // Obtener base de datos de RUCs simulados
+  getRucDataBase: async (): Promise<RucData[]> => {
+    const response = await axios.get("/wizard/search-ruc.json")
+    return response.data.data
+  },
+
 }

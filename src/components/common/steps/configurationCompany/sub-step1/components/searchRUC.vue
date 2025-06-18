@@ -95,98 +95,36 @@ import { Icon } from "@iconify/vue"
 import { useInitialData } from "@/composables/useInitialData"
 import { useWizardStore } from "@/stores/wizardStore"
 import { useToast } from 'vue-toastification';
+import { wizardService, CompanyExist, RucData } from "@/services/api"
 
 // Obtener instancia del store
 const wizardStore = useWizardStore()
 
-// Base de datos simulada con empresas existentes
-const companyDatabase = [
-  {
-    ruc: "1234567890001",
-    legalname: "EMPRESA EJEMPLO S.A.",
-    exist: true,
-    typePlan: "Plan Premium",
-    frequencyType: "Mensual"
-  },
-  {
-    ruc: "0987654321001",
-    legalname: "CORPORACIÓN TEST C.A.",
-    exist: true,
-    typePlan: "Plan Básico",
-    frequencyType: "Anual"
-  },
-  {
-    ruc: "1122334455001",
-    legalname: "SERVICIOS PRUEBA LTDA.",
-    exist: true,
-    typePlan: "Plan Pyme",
-    frequencyType: "Mensual"
-  }
-];
+// Eliminar companyDatabase y checkExistingCompany, reemplazar por función asíncrona que consulta el endpoint
 
-// Base de datos simulada con 5 RUCs diferentes (original)
-const rucDatabase = [
-  {
-    ruc: "1792780241001",
-    legalName: "TODONEG S.A.",
-    status: "ACTIVO",
-    regimeRUC: "General",
-    isAgent: true,
-    accountingRequired: true,
-    categoryRUC: "Negocio Popular",
-    idBranch: "001",
-    commercialName: "Wanqara",
-    address: "PICHINCHA / QUITO / IÑAQUITO / 10 DE AGOSTO N33-62 Y N33 GUAYANAS",
-  },
-  {
-    ruc: "1790016919001",
-    legalName: "CORPORACIÓN FAVORITA C.A.",
-    status: "ACTIVO",
-    regimeRUC: "General",
-    isAgent: true,
-    accountingRequired: true,
-    categoryRUC: "Contribuyente Especial",
-    idBranch: "001",
-    commercialName: "Supermaxi",
-    address: "PICHINCHA / QUITO / CUMBAYÁ / AV. INTEROCEÁNICA KM 12.5 Y PASAJE BERMEJO",
-  },
-  {
-    ruc: "1791251237001",
-    legalName: "PROCESADORA NACIONAL DE ALIMENTOS C.A. PRONACA",
-    status: "ACTIVO",
-    regimeRUC: "General",
-    isAgent: true,
-    accountingRequired: true,
-    categoryRUC: "Contribuyente Especial",
-    idBranch: "001",
-    commercialName: "PRONACA",
-    address: "PICHINCHA / QUITO / TUMBACO / VÍA INTEROCEÁNICA KM 21",
-  },
-  {
-    ruc: "0992757892001",
-    legalName: "CORPORACIÓN EL ROSADO S.A.",
-    status: "ACTIVO",
-    regimeRUC: "General",
-    isAgent: true,
-    accountingRequired: true,
-    categoryRUC: "Contribuyente Especial",
-    idBranch: "001",
-    commercialName: "Mi Comisariato",
-    address: "GUAYAS / GUAYAQUIL / TARQUI / AV. 9 DE OCTUBRE 729 Y BOYACÁ",
-  },
-  {
-    ruc: "1791410726001",
-    legalName: "TECNOMEGA C.A.",
-    status: "SUSPENDIDO",
-    regimeRUC: "General",
-    isAgent: false,
-    accountingRequired: true,
-    categoryRUC: "Sociedad",
-    idBranch: "001",
-    commercialName: "Tecnomega",
-    address: "PICHINCHA / QUITO / LA CONCEPCIÓN / AV. REPÚBLICA E2-51 Y ATAHUALPA",
+// Verificar si el RUC ya existe en la base de datos del endpoint
+const checkExistingCompany = async (ruc: string): Promise<CompanyExist | undefined> => {
+  try {
+    const companies = await wizardService.getCompanyExist()
+    return companies.find(company => company.ruc === ruc)
+  } catch (error) {
+    console.error("Error consultando empresas existentes:", error)
+    return undefined
   }
-];
+}
+
+// Eliminar rucDatabase y la función findRucInDatabase, reemplazar por función asíncrona que consulta el endpoint
+
+// Buscar un RUC en la base de datos simulada (ahora desde el endpoint)
+const findRucInDatabase = async (ruc: string): Promise<RucData | undefined> => {
+  try {
+    const rucs = await wizardService.getRucDataBase()
+    return rucs.find(item => item.ruc === ruc)
+  } catch (error) {
+    console.error("Error consultando base de datos de RUCs:", error)
+    return undefined
+  }
+}
 
 // Valores iniciales para los datos de la compañía
 const companyCreationInitial = {
@@ -301,17 +239,6 @@ const validateRuc = (ruc: string): boolean => {
   return true
 }
 
-// Verificar si el RUC ya existe en la base de datos simulada
-const checkExistingCompany = (ruc: string) => {
-  return companyDatabase.find(company => company.ruc === ruc && company.exist === true)
-}
-
-// Buscar un RUC en la base de datos simulada
-const findRucInDatabase = (ruc: string) => {
-  // Buscar el RUC exacto en la base de datos
-  return rucDatabase.find(item => item.ruc === ruc)
-}
-
 // Actualizar el store con los datos del SRI
 const updateStoreWithSRIData = (data: any) => {
   // Actualizar los datos de companyCreation
@@ -389,21 +316,17 @@ const searchRuc = async () => {
     // Simular una petición a un servidor (esperar 1 segundo)
     await new Promise(resolve => setTimeout(resolve, 1000))
 
-    // Verificar si la empresa ya existe en nuestra base de datos simulada
-    const existingCompanyData = checkExistingCompany(rucValue.value)
+    // Consultar empresas existentes desde el endpoint
+    const existingCompanyData = await checkExistingCompany(rucValue.value)
 
     if (existingCompanyData) {
       console.log("Empresa ya existente:", existingCompanyData)
-      
-      // Guardar los datos de la empresa existente para mostrarlos en el modal
       existingCompany.value = {
         ruc: existingCompanyData.ruc,
         legalname: existingCompanyData.legalname,
         typePlan: existingCompanyData.typePlan,
         frequencyType: existingCompanyData.frequencyType
       }
-      
-      // Mostrar el modal
       showExistingCompanyModal.value = true
       isLoading.value = false
       return
@@ -419,8 +342,7 @@ const searchRuc = async () => {
     }
 
     // Si no existe, buscar el RUC en la base de datos simulada del SRI
-    const foundRuc = findRucInDatabase(rucValue.value)
-    
+    const foundRuc = await findRucInDatabase(rucValue.value)
     if (foundRuc) {
       console.log("RUC encontrado:", foundRuc)
 
