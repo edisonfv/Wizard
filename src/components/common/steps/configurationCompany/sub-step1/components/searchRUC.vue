@@ -207,8 +207,33 @@ const toast = useToast();
 // Definir los eventos que este componente puede emitir
 const emit = defineEmits(["ruc-searched", "ruc-not-found", "ruc-valid-for-continue"])
 
-// Inicializar rucIsValid en el montaje del componente
+// --- FUNCIÓN PARA RESETEAR EL STEP DE BÚSQUEDA DE RUC ---
+function resetRucStep() {
+  // Limpiar input y flags
+  rucValue.value = "";
+  isFocused.value = false;
+  isLoading.value = false;
+  validationError.value = "";
+  rucIsValid.value = false;
+  sinRucActive.value = false;
+  showExistingCompanyModal.value = false;
+  existingCompany.value = {
+    ruc: "",
+    legalname: "",
+    typePlan: "",
+    frequencyType: ""
+  };
+  // Limpiar datos de companyCreation y otros relacionados
+  updateCompanyCreation({ ...companyCreationInitial });
+  updateBranchAndPOS({ ...branchAndPOSInitial });
+  updateCompanyConfig({ ...companyConfigInitial });
+  // Limpiar flag global de validación en el store
+  wizardStore.updateWizardState({ rucValidated: false, sinRucActive: false });
+}
+
+// Llamar a resetRucStep al montar el componente (cada vez que se entra a este paso)
 onMounted(() => {
+  resetRucStep();
   rucIsValid.value = wizardStore.wizardState.rucValidated || false;
 });
 

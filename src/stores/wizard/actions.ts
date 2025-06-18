@@ -77,4 +77,13 @@ export const actions = {
     // Opcional: limpiar localStorage
     localStorage.removeItem("wizardData")
   },
+
+  /**
+   * Limpia completamente todo el formData (sin afectar wizardState)
+   */
+  resetCompanyCreation(this: WizardInterface) {
+    const defaultState = initialState();
+    this.formData = { ...defaultState.formData };
+    saveWizardState(this as unknown as Record<string, any>);
+  },
 }
