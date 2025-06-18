@@ -11,6 +11,21 @@ interface WizardData {
   // Puedes agregar otros campos si los necesitas en el futuro
 }
 
+// Interfaz para los vendedores
+export interface Vendedor {
+  id: number
+  nombre: string
+}
+
+// Interfaz para los planes
+export interface Plan {
+  label: string
+  value: string
+  precioMensual: string
+  precioAnual: string
+  caracteristicas?: string[]
+}
+
 // Servicio simplificado con tipos
 export const wizardService = {
   // Obtener el comprobante de pago
@@ -26,4 +41,16 @@ export const wizardService = {
     const updatedData = { ...currentData, proofPaymanet: proofPayment }
     await api.put("/wizardData", updatedData)
   },
+
+  // Obtener lista de vendedores
+  getVendedores: async (): Promise<Vendedor[]> => {
+    const response = await axios.get("/wizard/sallers.json")
+    return response.data.data // Retorna el array de vendedores desde la clave 'data'
+  },
+
+  // Obtener lista de planes
+  getPlanes: async (): Promise<Plan[]> => {
+    const response = await axios.get("/wizard/plans.json")
+    return response.data
+  }
 }

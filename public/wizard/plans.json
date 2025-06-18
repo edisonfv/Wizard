@@ -1,0 +1,74 @@
+{
+  "data": [
+    {
+      "label": "Plan Gratuito",
+      "value": "freeplan",
+      "precioMensual": "0",
+      "precioAnual": "0",
+      "caracteristicas": [
+        "1 Usuario Simultaneo",
+        "1 Establecimiento Matriz",
+        "12 Facturas electrónicas", 
+        "Emisión ilimitada de recibos"
+      ],
+      "subscriptions": [
+        { "id": 1, "title": "KDS", "description": "Sistema de cocina para visualizar y gestionar pedidos en tiempo real." }
+      ]
+    },
+    {
+      "label": "Plan Lite",
+      "value": "liteplan",
+      "precioMensual": " ",
+      "precioAnual": "49.99",
+      "caracteristicas": [
+        "2 Usuarios Simultaneaos",
+        "1 Establecimiento Matriz",
+        "Comprobantes electrónicos: facturas, notas de crédito",
+        "Plan Anual: 240 comprobantes anuales no acumulables"
+      ],
+      "subscriptions": [
+        { "id": 1, "title": "KDS", "description": "Sistema de cocina para visualizar y gestionar pedidos en tiempo real." },
+        { "id": 2, "title": "Scan", "description": "Sistema de escaner y visualizacion de productos" }
+      ]
+    },
+    {
+      "label": "Plan Básico",
+      "value": "basicplan",
+      "precioMensual": "20",
+      "precioAnual": "168",
+      "caracteristicas": [
+        "4 Usuaiors Simultaneos",
+        "1 Establecimiento Matriz",
+        "Gestion de 3 bodegas adicionales",
+        "Comprobantes electrónicos: facturas, notas de crédito",
+        "Plan Anual: 1200 comprobantes anuales, no acumulables",
+        "Plan Mensual: 50 comprobantes mensuales, no acumulables"
+      ],
+      "subscriptions": [
+        { "id": 1, "title": "KDS", "description": "Sistema de cocina para visualizar y gestionar pedidos en tiempo real." },
+        { "id": 2, "title": "Scan", "description": "Sistema de escaner y visualizacion de productos" },
+        { "id": 3, "title": "PosMeseros", "description": "Sistema de peticion de pedidos ideal para meseros" }
+      ]
+    },
+    {
+      "label": "Plan Pyme",
+      "value": "pymeplan",
+      "precioMensual": "28",
+      "precioAnual": "235.20",
+      "caracteristicas": [
+        "Usuarios simultaneos ilimitados",
+        "1 Establecimineto Matriz",
+        "Sucursales ilimitadas",
+        "Gestión de bodegas ilimitadas",
+        "Usuarios ilimitados",
+        "Comprobantes electrónicos ilimitados"
+      ],
+      "subscriptions": [
+        { "id": 1, "title": "KDS", "description": "Sistema de cocina para visualizar y gestionar pedidos en tiempo real." },
+        { "id": 2, "title": "Scan", "description": "Sistema de escaner y visualizacion de productos" },
+        { "id": 3, "title": "PosMeseros", "description": "Sistema de peticion de pedidos ideal para meseros" },
+        { "id": 4, "title": "Servicio +", "description": "Sistema de servicio adicional" }
+      ]
+    }
+  ]
+}

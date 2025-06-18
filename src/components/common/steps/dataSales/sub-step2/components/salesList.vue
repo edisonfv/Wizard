@@ -129,23 +129,12 @@ import {
 } from "@ionic/vue"
 import { chevronDownOutline, checkmarkCircle, personOutline, alertCircleOutline } from "ionicons/icons"
 import { useInitialData } from "@/composables/useInitialData"
-
-// Datos de vendedores implementados directamente desde dbSales.json
-const vendedoresData = [
-  { id: 1, nombre: "Carlos Gómez" },
-  { id: 2, nombre: "María Rodríguez" },
-  { id: 3, nombre: "Luis Fernández" },
-  { id: 4, nombre: "Ana Torres" },
-  { id: 5, nombre: "Jorge Ramírez" },
-  { id: 6, nombre: "Elena Martínez" },
-  { id: 7, nombre: "Pedro Sánchez" },
-  { id: 8, nombre: "Laura Morales" },
-  { id: 9, nombre: "Andrés Herrera" },
-  { id: 10, nombre: "Sofía Castro" },
-]
+import { wizardService } from '@/services/api'
+import type { Vendedor } from '@/services/api'
 
 // Estado para almacenar los vendedores
-const vendedores = ref(vendedoresData)
+type VendedorList = Vendedor[]
+const vendedores = ref<VendedorList>([])
 
 // Valores iniciales para el formulario
 const initialValues = {
@@ -180,10 +169,10 @@ const popoverStyle = ref({})
 // Vendedores filtrados basados en el término de búsqueda
 const vendedoresFiltrados = computed(() => {
   if (!terminoBusqueda.value) {
-    return vendedores.value
+    return vendedores.value || []
   }
   const busqueda = terminoBusqueda.value.toLowerCase()
-  return vendedores.value.filter((vendedor) => vendedor.nombre.toLowerCase().includes(busqueda))
+  return (vendedores.value || []).filter((vendedor) => vendedor.nombre.toLowerCase().includes(busqueda))
 })
 
 // Función para obtener las iniciales del nombre
@@ -243,9 +232,16 @@ const seleccionarVendedor = (vendedor: { id: number; nombre: string }) => {
 }
 
 // Cargar datos y configurar event listeners
-onMounted(() => {
+onMounted(async () => {
   simularCarga()
   window.addEventListener("resize", handleResize)
+  try {
+    const data = await wizardService.getVendedores()
+    vendedores.value = data
+  } catch (e) {
+    error.value = 'No se pudieron cargar los vendedores.'
+    vendedores.value = []
+  }
 })
 
 // Función para manejar el cambio de tamaño de la ventana

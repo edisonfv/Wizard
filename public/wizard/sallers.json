@@ -1,0 +1,14 @@
+{
+  "data": [
+    { "id": 1, "nombre": "Carlos Gómez" },
+    { "id": 2, "nombre": "María Rodríguez" },
+    { "id": 3, "nombre": "Luis Fernández" },
+    { "id": 4, "nombre": "Ana Torres" },
+    { "id": 5, "nombre": "Jorge Ramírez" },
+    { "id": 6, "nombre": "Elena Martínez" },
+    { "id": 7, "nombre": "Pedro Sánchez" },
+    { "id": 8, "nombre": "Laura Morales" },
+    { "id": 9, "nombre": "Andrés Herrera" },
+    { "id": 10, "nombre": "Sofía Castro" }
+  ]
+}

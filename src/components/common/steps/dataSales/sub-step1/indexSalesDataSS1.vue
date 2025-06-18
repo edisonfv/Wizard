@@ -2,7 +2,7 @@
   <ion-card class="w-full shadow-md rounded-xl overflow-hidden">
     <ion-card-content class="p-4">
       <typePlan v-model:selectedPlan="selectedPlan" />
-      <suscriptionsPlan v-if="selectedPlan" />
+      <suscriptionsPlan v-if="selectedPlan" :selected-plan="selectedPlan" />
     </ion-card-content>
   </ion-card>
 </template>

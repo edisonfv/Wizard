@@ -99,7 +99,7 @@
 </template>
   
 <script setup lang="ts">
-import { ref, watch } from "vue"
+import { ref, watch, onMounted } from "vue"
 import {
   IonText,
   IonBadge,
@@ -111,6 +111,7 @@ import {
 import { checkmarkCircle } from "ionicons/icons"
 import { useInitialData } from "@/composables/useInitialData"
 import SelectableCard from "@/components/ui/selectableCard.vue"
+import { wizardService, type Plan } from '@/services/api'
 
 // Definimos la interfaz para las opciones de tipo de plan con precios
 interface TipoPlanesOpcion {
@@ -151,62 +152,19 @@ watch(selectedPlan, (val) => {
 });
 
 // Array con las opciones de tipo de plan incluyendo precios
-const opcionesTipoPlanes = ref<TipoPlanesOpcion[]>([
-  {
-    label: "Plan Gratuito",
-    value: "freeplan",
-    precioMensual: "0",
-    precioAnual: "0",
-    caracteristicas: [
-    "1 Usuario Simultaneo",
-    "1 Establecimiento Matriz",
-    "12 Facturas electrónicas", 
-    "Emisión ilimitada de recibos",
-    
+const opcionesTipoPlanes = ref<Plan[]>([])
 
-  ],
-  },
-  {
-    label: "Plan Lite",
-    value: "liteplan",
-    precioMensual: " ",
-    precioAnual: "49.99",
-    caracteristicas: [
-      "2 Usuarios Simultaneaos",
-      "1 Establecimiento Matriz",
-      "Comprobantes electrónicos: facturas, notas de crédito",
-      "Plan Anual: 240 comprobantes anuales no acumulables",
-    ],
-  },
-  {
-    label: "Plan Básico",
-    value: "basicplan",
-    precioMensual: "20",
-    precioAnual: "168",
-    caracteristicas: [
-      "4 Usuaiors Simultaneos",
-      "1 Establecimiento Matriz",
-      "Gestion de 3 bodegas adicionales",
-      "Comprobantes electrónicos: facturas, notas de crédito",
-      "Plan Anual: 1200 comprobantes anuales, no acumulables",
-      "Plan Mensual: 50 comprobantes mensuales, no acumulables",
-    ],
-  },
-  {
-    label: "Plan Pyme",
-    value: "pymeplan",
-    precioMensual: "28",
-    precioAnual: "235.20",
-    caracteristicas: [
-      "Usuarios simultaneos ilimitados",
-      "1 Establecimineto Matriz",
-      "Sucursales ilimitadas",
-      "Gestión de bodegas ilimitadas",
-      "Usuarios ilimitados",
-      "Comprobantes electrónicos ilimitados",
-    ],
-  },
-])
+onMounted(async () => {
+  try {
+    const response = await wizardService.getPlanes() as Plan[] | { data: Plan[] }
+    // Si la respuesta es un array, úsala directamente; si es un objeto con 'data', usa 'data'
+    opcionesTipoPlanes.value = Array.isArray(response)
+      ? response
+      : (Array.isArray((response as any).data) ? (response as any).data : [])
+  } catch (e) {
+    opcionesTipoPlanes.value = []
+  }
+})
 
 // Función para obtener el precio según el periodo seleccionado
 const getPlanPrice = (plan: TipoPlanesOpcion): string => {

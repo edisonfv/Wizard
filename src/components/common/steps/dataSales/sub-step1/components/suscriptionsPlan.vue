@@ -14,31 +14,54 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 import { Icon } from '@iconify/vue';
+import { wizardService, type Plan } from '@/services/api';
 
-const suscriptions = ref([
-  {
-    id: 1,
-    title: 'KDS',
-    description: 'Sistema de cocina para visualizar y gestionar pedidos en tiempo real.'
-  },
-  {
-    id: 2,
-    title: 'POS Móvil',
-    description: 'Punto de venta móvil para ventas rápidas y gestión desde cualquier lugar.'
-  },
-  {
-    id: 3,
-    title: 'Facturación Electrónica',
-    description: 'Emite comprobantes electrónicos de manera ágil y segura.'
-  },
-  {
-    id: 4,
-    title: 'Reportes Avanzados',
-    description: 'Accede a reportes detallados para la toma de decisiones.'
+// Recibe el plan seleccionado como prop
+const props = defineProps<{ selectedPlan: string }>();
+
+const suscriptions = ref<any[]>([]);
+const planes = ref<Plan[]>([]);
+
+async function cargarPlanes() {
+  try {
+    const response = await wizardService.getPlanes();
+    // Siempre extraer el array de planes correctamente
+    if (Array.isArray(response)) {
+      planes.value = response;
+    } else if (response && typeof response === 'object' && Array.isArray((response as any).data)) {
+      planes.value = (response as any).data;
+    } else {
+      planes.value = [];
+    }
+    updateSuscriptions();
+  } catch (e) {
+    planes.value = [];
+    suscriptions.value = [];
   }
-]);
+}
+
+function updateSuscriptions() {
+  const plan = planes.value.find(p => p.value === props.selectedPlan);
+  if (plan && Array.isArray((plan as any).subscriptions)) {
+    suscriptions.value = (plan as any).subscriptions;
+  } else {
+    suscriptions.value = [];
+  }
+}
+
+onMounted(() => {
+  cargarPlanes();
+});
+
+watch(
+  () => props.selectedPlan,
+  () => {
+    updateSuscriptions();
+  },
+  { immediate: true, flush: 'post' }
+);
 </script>
 
 <style scoped>
