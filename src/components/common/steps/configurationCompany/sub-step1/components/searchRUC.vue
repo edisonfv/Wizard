@@ -241,6 +241,13 @@ const validateRuc = (ruc: string): boolean => {
 
 // Actualizar el store con los datos del SRI
 const updateStoreWithSRIData = (data: any) => {
+  if (sinRucActive.value) {
+    // Solo guardar el RUC si está activo el modo Sin RUC
+    updateCompanyCreation({ ruc: data.ruc });
+    // No actualizar branchAndPOS ni companyConfig
+    console.log("Solo se guardó el RUC en modo Sin RUC:", { ruc: data.ruc });
+    return;
+  }
   // Actualizar los datos de companyCreation
   updateCompanyCreation({
     ruc: data.ruc,
