@@ -99,7 +99,7 @@
 </template>
   
 <script setup lang="ts">
-import { ref, watch, onMounted } from "vue"
+import { ref, watch } from "vue"
 import {
   IonText,
   IonBadge,
@@ -133,31 +133,21 @@ const { data: salesData, updateField } = useInitialData('salesData', {
   debug: false // Activar para depuración si es necesario
 });
 
-// Estado local para el plan seleccionado
-const selectedPlan = ref("");
+// PROPS y EMITS para comunicación con el padre
+const props = defineProps<{ selectedPlan: string }>();
+const emit = defineEmits(['update:selectedPlan']);
 
-// Sincronizar el estado local con el store cuando cambia
-// Inicializar con valores predeterminados
-onMounted(() => {
-  // Inicializar el estado local con el valor del store
-  selectedPlan.value = salesData.value.plan || "";
-  
-  // IMPORTANTE: Establecer el valor predeterminado para billingFrequency si no existe
-  if (!salesData.value.billingFrequency) {
-    updateField('billingFrequency', 'mensual');
-  }
-  
-  // Observar cambios en el store para actualizar el estado local
-  watch(() => salesData.value.plan, (newValue) => {
-    if (newValue && newValue !== selectedPlan.value) {
-      selectedPlan.value = newValue;
-      
-      // IMPORTANTE: Asegurar que billingFrequency tenga un valor cuando se selecciona un plan
-      if (!salesData.value.billingFrequency) {
-        updateField('billingFrequency', 'mensual');
-      }
-    }
-  }, { immediate: true });
+// Estado local para el plan seleccionado
+const selectedPlan = ref(props.selectedPlan || "");
+
+// Sincronizar el estado local con la prop
+watch(() => props.selectedPlan, (val) => {
+  if (val !== selectedPlan.value) selectedPlan.value = val;
+});
+
+// Emitir al padre cuando cambia el plan
+watch(selectedPlan, (val) => {
+  emit('update:selectedPlan', val);
 });
 
 // Array con las opciones de tipo de plan incluyendo precios
@@ -226,8 +216,7 @@ const getPlanPrice = (plan: TipoPlanesOpcion): string => {
 // Función para seleccionar un plan
 const seleccionarPlan = (value: string) => {
   updateField('plan', value);
-  
-  // IMPORTANTE: Asegurar que billingFrequency tenga un valor cuando se selecciona un plan
+  selectedPlan.value = value;
   if (!salesData.value.billingFrequency) {
     updateField('billingFrequency', 'mensual');
   }

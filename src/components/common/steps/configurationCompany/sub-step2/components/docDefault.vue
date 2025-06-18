@@ -1,5 +1,5 @@
 <template>
-  <span class="block text-left text-gray-700">Selecciona el tipo de documento que deseas emitir por defecto al vender</span>
+  <span class="block text-left text-gray-700">Elige el tipo de documento que deseas emitir por defecto al vender</span>
   <div class="py-2 bg-white rounded-xl">    
     <!-- Grid mejorado con SelectableCard -->
     <div class="w-full">

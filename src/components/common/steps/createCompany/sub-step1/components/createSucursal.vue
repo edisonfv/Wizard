@@ -3,6 +3,18 @@
     <!-- Título para datos de la matriz -->
     <h4 class="subsection-title">Datos de la Matriz</h4>
 
+    <!-- Menú seleccionable de sucursales -->
+    <div class="select-branch-menu">
+      <label for="branchMenu" class="select-label">Selecciona una sucursal:</label>
+      <select id="branchMenu" v-model="selectedBranch" class="branch-select">
+        <option disabled value="">-- Seleccione una opción --</option>
+        <option value="001 - Wanqara">001 - Wanqara</option>
+        <option value="002 - Illarli">002 - Illarli</option>
+        <option value="003 - Wanqara">003 - Wanqara</option>
+        <option value="004 - Illarli">004 - Illarli</option>
+      </select>
+    </div>
+
     <!-- Nombre Comercial y Código de Sucursal en la misma fila -->
     <div class="form-row">
       <!-- Nombre Comercial -->
@@ -31,11 +43,22 @@
     <!-- Nombre de tu Sucursal -->
     <FormField
       v-model="data.branch.name"
-      label="Nombre de la Matriz"
+      label="Nombre"
       icon="mdi:home-city"
-      placeholder="Nombre de la matriz"
+      placeholder="Nombre"
       required
       @validation="(isValid) => handleValidation('name', isValid)"
+    />
+
+    <!-- Nombre de la Matriz (solo lectura) -->
+    <FormField
+      v-model="data.branch.nameToSave"
+      label="Nombre de la Matriz"
+      icon="mdi:home-city"
+      placeholder="Nombre a guardar"
+      required
+      readonly
+      @validation="(isValid) => handleValidation('nameToSave', isValid)"
     />
 
     <!-- Dirección de la Sucursal -->
@@ -75,7 +98,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import FormField from "@/components/ui/FormField.vue";
 import { useInitialData } from "@/composables/useInitialData";
 import { 
@@ -90,6 +113,7 @@ const initialValues = {
     commercialName: '',
     idBranch: '',
     name: '',
+    nameToSave: '', // <-- Agregado para evitar error de propiedad inexistente
     address: '',
     phone: '',
     email: '',
@@ -113,13 +137,14 @@ const { data } = useInitialData(
 );
 
 // Definir un tipo para las claves de validación
-type ValidationKey = 'commercialName' | 'idBranch' | 'name' | 'address' | 'phone' | 'email';
+type ValidationKey = 'commercialName' | 'idBranch' | 'name' | 'nameToSave' | 'address' | 'phone' | 'email';
 
 // Estado para validación de campos con tipo explícito
 const validationState = ref<Record<ValidationKey, boolean>>({
   commercialName: true,
   idBranch: true,
   name: true,
+  nameToSave: true,
   address: true,
   phone: true,
   email: true
@@ -150,6 +175,36 @@ const validateEmailInput = (event: Event) => {
 
 const wizardStore = useWizardStore();
 const sinRucActive = wizardStore.wizardState?.sinRucActive || false;
+
+const selectedBranch = ref("");
+
+// Watch para actualizar el nombre de la matriz automáticamente
+watch([
+  () => data.value.branch.idBranch,
+  () => data.value.branch.name
+], ([codigo, nombre]) => {
+  if (codigo && nombre) {
+    data.value.branch.nameToSave = `${codigo} - ${nombre}`;
+  } else if (codigo) {
+    data.value.branch.nameToSave = `${codigo}`;
+  } else if (nombre) {
+    data.value.branch.nameToSave = `${nombre}`;
+  } else {
+    data.value.branch.nameToSave = '';
+  }
+});
+
+// Actualiza los campos de código y nombre comercial al seleccionar una sucursal del menú desplegable
+watch(selectedBranch, (val) => {
+  if (val) {
+    const [codigo, ...nombreArr] = val.split(' - ');
+    data.value.branch.idBranch = codigo || '';
+    data.value.branch.commercialName = nombreArr.join(' - ') || '';
+  } else {
+    data.value.branch.idBranch = '';
+    data.value.branch.commercialName = '';
+  }
+});
 </script>
 
 <style scoped>
@@ -177,5 +232,36 @@ const sinRucActive = wizardStore.wizardState?.sinRucActive || false;
   .form-row {
     flex-direction: column;
   }
+}
+
+/* Estilos para el menú seleccionable de sucursales */
+.select-branch-menu {
+  margin-bottom: 16px;
+}
+.select-label {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 4px;
+  display: block;
+}
+.branch-select {
+  width: 100%;
+  padding: 6px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  font-size: 1rem;
+  color: #222;
+  background: #fff;
+}
+.branch-select option[disabled][value=""] {
+  color: #bdbdbd !important;
+  /* Más opaco, simula placeholder */
+}
+.branch-select:invalid {
+  color: #bdbdbd;
+}
+.branch-select {
+  color: #222;
 }
 </style>
