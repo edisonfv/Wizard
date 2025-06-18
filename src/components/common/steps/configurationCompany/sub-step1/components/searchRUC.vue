@@ -341,7 +341,8 @@ const searchRuc = async () => {
 
     // Si el toggle Sin RUC está activo
     if (sinRucActive.value) {
-      // Emitir evento especial para indicar que el RUC no existe pero es válido para continuar
+      // Guardar el RUC en el store aunque sea modo Sin RUC
+      updateCompanyCreation({ ruc: rucValue.value });
       rucIsValid.value = true;
       emit("ruc-valid-for-continue", rucValue.value);
       isLoading.value = false;
@@ -361,25 +362,20 @@ const searchRuc = async () => {
         // Si el RUC existe pero no está ACTIVO, no lo consideramos válido
         rucIsValid.value = false
       }
-      
       // Actualizar el store con los datos encontrados
       updateStoreWithSRIData(foundRuc)
-      
       // Preparamos los datos que necesita el componente informationRUC
       const rucData = {
         ruc: foundRuc.ruc,
         razonSocial: foundRuc.legalName,
         estado: foundRuc.status,
       }
-      
       // Emitir el evento con los datos del RUC
       emit("ruc-searched", rucData)
     } else {
       console.log("RUC no encontrado:", rucValue.value)
-      
       // Asegurar que el RUC no válido
       rucIsValid.value = false
-      
       // Emitir el evento de RUC no encontrado
       emit("ruc-not-found", rucValue.value)
     }

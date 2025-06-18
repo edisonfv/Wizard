@@ -51,9 +51,12 @@ export interface SalesData {
     transferData: {
       financialInstitution: string,
       proofPayment: string,
+      numberLote: string,
+      
     },
     datafastData: {
       typeCard: string,
+      proofPayment: string,
       numberLote: string,
     }
   }

@@ -46,10 +46,12 @@ export const initialState = (): WizardInterface => ({
         transferData: {
           financialInstitution: "",
           proofPayment: "",
+          numberLote: ""
         },
         datafastData: {
           typeCard: "",
-          numberLote: "",
+          proofPayment: "",
+          numberLote: ""
         }
       }
     },
