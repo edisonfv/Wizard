@@ -9,15 +9,18 @@ export const initialState = (): WizardInterface => ({
   },
   formData: {
     createUser: {
+      id: "",
       name: "",
+      phone: "",
       email: "",
-      base64: "",
-      rol: {
-        id: "9de79ed8-b4f0-48bb-ab5d-6caca8a454ed",
-        name: "Administrador",
-        is_main: true,
-        description: null
-      }
+      
+    },
+    billingData: {
+      documentType: "cedula",
+      documentNumber: "",
+      name:"",
+      phone:"",
+      email: "",
     },
     consultant: {
       sellerId: "",

@@ -11,13 +11,13 @@
             <form @submit.prevent class="form-container">
               <!-- Cédula -->
               <FormField
-                v-model="data.cedula"
+                v-model="data.id"
                 label="Cédula"
                 icon="mdi:card-account-details"
                 placeholder="Cédula"
                 required
-                @input="handleCedulaInput"
-                @validation="(isValid) => handleValidation('cedula', isValid)"
+                @input="handleIdInput"
+                @validation="(isValid) => handleValidation('id', isValid)"
               />
 
               <!-- Nombres -->
@@ -28,7 +28,7 @@
                 placeholder="Nombres"
                 required
                 @input="handleNameInput"
-                @validation="(isValid) => handleValidation('firstName', isValid)"
+                @validation="(isValid) => handleValidation('name', isValid)"
               />
 
               <!-- Apellidos -->
@@ -40,6 +40,17 @@
                 required
                 @input="handleLastInput"
                 @validation="(isValid) => handleValidation('lastName', isValid)"
+              />
+
+              <!-- Teléfono -->
+              <FormField
+                v-model="data.phone"
+                label="Teléfono"
+                icon="mdi:phone"
+                placeholder="Teléfono"
+                required
+                @input="handlePhoneInput"
+                @validation="(isValid) => handleValidation('phone', isValid)"
               />
 
               <!-- Correo Electrónico -->
@@ -97,16 +108,10 @@ const modalAnswered = ref(false);
 
 // Valores iniciales para el formulario
 const initialValues = {
+  id: "",
   name: "",
+  phone: "",
   email: "",
-  base64: "",
-  cedula: "",
-  rol: {
-    id: "9de79ed8-b4f0-48bb-ab5d-6caca8a454ed",
-    name: "Administrador",
-    is_main: true,
-    description: null
-  }
 };
 
 // Usar el composable useInitialData para manejar los datos
@@ -126,15 +131,16 @@ const billDataFormRef = ref<any>(null);
 const billSectionParent = ref<HTMLElement | null>(null);
 
 // Definir un tipo para las claves de validación
-type ValidationKey = 'firstName' | 'lastName' | 'email' | 'rol' | 'cedula';
+// Ahora incluye 'id', 'name', 'lastName', 'phone', 'email'
+type ValidationKey = 'id' | 'name' | 'lastName' | 'phone' | 'email';
 
 // Estado para validación de campos con tipo explícito
 const validationState = ref<Record<ValidationKey, boolean>>({
-  firstName: true,
+  id: true,
+  name: true,
   lastName: true,
-  email: true,
-  rol: true,
-  cedula: true
+  phone: true,
+  email: true
 });
 
 // Función para manejar eventos de validación con tipos correctos
@@ -177,11 +183,20 @@ const handleEmailInput = (event: Event) => {
   handleValidation('email', result.isValid);
 };
 
-const handleCedulaInput = (event: Event) => {
+// Manejador para el input de cédula (ahora id)
+const handleIdInput = (event: Event) => {
   const target = event.target as HTMLInputElement | null;
-  const cedulaValue = target?.value ?? '';
-  updateField('cedula', cedulaValue);
-  handleValidation('cedula', cedulaValue.length > 0);
+  const idValue = target?.value ?? '';
+  updateField('id', idValue);
+  handleValidation('id', idValue.length > 0);
+};
+
+// Manejador para el input de teléfono
+const handlePhoneInput = (event: Event) => {
+  const target = event.target as HTMLInputElement | null;
+  const phoneValue = target?.value ?? '';
+  updateField('phone', phoneValue);
+  handleValidation('phone', phoneValue.length > 0);
 };
 
 // Función de validación para el email que devuelve un objeto con value e isValid
@@ -230,7 +245,7 @@ watch([nombres, apellidos], () => {
 const copyPersonalToBill = () => {
   const billRef = billDataFormRef.value;
   if (billRef && billRef.data && billRef.updateField) {
-    billRef.updateField('cedula', data.value.cedula);
+    billRef.updateField('cedula', data.value.id);
     billRef.updateField('name', data.value.name);
     billRef.updateField('email', data.value.email);
     if (billRef.setNombres) billRef.setNombres(nombres.value);

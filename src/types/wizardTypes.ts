@@ -9,15 +9,10 @@ export interface WizardState {
 
 // Interfaces para la información personal
 export interface createUser {
+  id: string
   name: string
+  phone: string
   email: string
-  base64: string
-  rol:{
-    id: string
-    name: string
-    is_main: boolean
-    description: null
-  }
 }
 
 // Interfaces para el consultor/vendedor
@@ -117,4 +112,13 @@ export interface FormData {
 export interface WizardInterface {
   wizardState: WizardState
   formData: FormData
+}
+
+// Billing data interface for billData.vue
+export interface BillingData {
+  documentType: "cedula" | "ruc";
+  documentNumber: string;
+  name: string;
+  phone: string;
+  email: string;
 }

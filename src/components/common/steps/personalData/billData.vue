@@ -29,37 +29,37 @@
             </div>
             <div style="flex: 1;">
               <FormField
-                v-model="data.cedula"
+                v-model="data.documentNumber"
                 :label="documentType === 'cedula' ? 'Cédula' : 'RUC'"
                 :icon="documentType === 'cedula' ? 'mdi:card-account-details' : 'mdi:domain'"
                 :placeholder="documentType === 'cedula' ? 'Cédula' : 'RUC'"
                 required
-                @input="handleCedulaInput"
-                @validation="(isValid) => handleValidation('cedula', isValid)"
+                @input="handleDocumentNumberInput"
+                @validation="(isValid) => handleValidation('documentNumber', isValid)"
               />
             </div>
           </div>
 
           <!-- Nombres -->
           <FormField
-            v-model="nombres"
+            v-model="data.name"
             label="Nombres"
             icon="mdi:account"
             placeholder="Nombres"
             required
             @input="handleNameInput"
-            @validation="(isValid) => handleValidation('firstName', isValid)"
+            @validation="(isValid) => handleValidation('name', isValid)"
           />
 
-          <!-- Apellidos -->
+          <!-- Teléfono -->
           <FormField
-            v-model="apellidos"
-            label="Apellidos"
-            icon="mdi:account-outline"
-            placeholder="Apellidos"
+            v-model="data.phone"
+            label="Teléfono"
+            icon="mdi:phone"
+            placeholder="Teléfono"
             required
-            @input="handleLastInput"
-            @validation="(isValid) => handleValidation('lastName', isValid)"
+            @input="handlePhoneInput"
+            @validation="(isValid) => handleValidation('phone', isValid)"
           />
 
           <!-- Correo Electrónico -->
@@ -74,16 +74,6 @@
             :validator="validateEmailInput"
             errorMessage="Por favor, ingrese un correo electrónico válido"
           />
-
-          <!-- Rol -->
-          <!-- <FormField
-            v-model="data.rol.name"
-            label="Rol"
-            icon="oui:app-users-roles"
-            readonly
-            disabled
-            @validation="(isValid) => handleValidation('rol', isValid)"
-          /> -->
         </form>
       </div>
     </div>
@@ -91,147 +81,94 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted, nextTick, defineExpose } from 'vue';
+import { ref, watch, onMounted, defineExpose } from 'vue';
 import FormField from "@/components/ui/FormField.vue";
 import { useInitialData } from "@/composables/useInitialData";
-import {
-  allowOnlyLetters,
-  validateEmailInRealTime,
-} from "@/utils/input-controls";
+import { validateEmailInRealTime } from "@/utils/input-controls";
 
-// Valores iniciales para el formulario
+// Valores iniciales para el formulario según state.ts y wizardTypes.ts
 const initialValues = {
+  documentType: "cedula",
+  documentNumber: "",
   name: "",
+  phone: "",
   email: "",
-  base64: "",
-  cedula: "",
-  rol: {
-    id: "9de79ed8-b4f0-48bb-ab5d-6caca8a454ed",
-    name: "Administrador",
-    is_main: true,
-    description: null
-  }
 };
 
 // Usar el composable useInitialData para manejar los datos
 const { data, updateField } = useInitialData(
-  "billUser", // Cambiado para que sea independiente de personalData.vue
+  "billingData",
   initialValues,
   {
     autoSave: true,
-    debug: true // Activar debug para ver los logs
+    debug: true
   }
 );
-
-// Variables locales para nombres y apellidos
-const nombres = ref("");
-const apellidos = ref("");
 
 // Selector de tipo de documento
 const documentType = ref('cedula');
 
-// Definir un tipo para las claves de validación
-type ValidationKey = 'firstName' | 'lastName' | 'email' | 'rol' | 'cedula';
-
-// Estado para validación de campos con tipo explícito
-const validationState = ref<Record<ValidationKey, boolean>>({
-  firstName: true,
-  lastName: true,
-  email: true,
-  rol: true,
-  cedula: true
+// Estado para validación de campos
+// Ajustado a la nueva estructura
+const validationState = ref({
+  documentNumber: true,
+  name: true,
+  phone: true,
+  email: true
 });
 
-// Función para manejar eventos de validación con tipos correctos
-const handleValidation = (field: ValidationKey, isValid: boolean) => {
+const handleValidation = (field: keyof typeof validationState.value, isValid: boolean) => {
   validationState.value[field] = isValid;
 };
 
-// Función para actualizar el nombre completo
-const updateFullName = () => {
-  // Concatenar nombres y apellidos con un espacio entre ellos
-  const fullName = `${nombres.value} ${apellidos.value}`.trim();
-  
-  // Actualizar el campo name en el objeto data
-  updateField('name', fullName);
-  
-  console.log("Nombre completo actualizado:", fullName);
+const handleDocumentNumberInput = (event: Event) => {
+  const target = event.target as HTMLInputElement | null;
+  const value = target?.value ?? '';
+  updateField('documentNumber', value);
+  handleValidation('documentNumber', value.length > 0);
 };
 
-// Manejadores de eventos para los inputs con validación
 const handleNameInput = (event: Event) => {
-  nombres.value = allowOnlyLetters(event);
-  // Actualizar el nombre completo después de cambiar el nombre
-  nextTick(() => {
-    updateFullName();
-  });
+  const target = event.target as HTMLInputElement | null;
+  const value = target?.value ?? '';
+  updateField('name', value);
+  handleValidation('name', value.length > 0);
 };
 
-const handleLastInput = (event: Event) => {
-  apellidos.value = allowOnlyLetters(event);
-  // Actualizar el nombre completo después de cambiar el apellido
-  nextTick(() => {
-    updateFullName();
-  });
+const handlePhoneInput = (event: Event) => {
+  const target = event.target as HTMLInputElement | null;
+  const value = target?.value ?? '';
+  updateField('phone', value);
+  handleValidation('phone', value.length > 0);
 };
 
 const handleEmailInput = (event: Event) => {
-  // Usar la función de validación en tiempo real
   const result = validateEmailInRealTime(event);
   updateField('email', result.value);
   handleValidation('email', result.isValid);
 };
 
-const handleCedulaInput = (event: Event) => {
-  const target = event.target as HTMLInputElement | null;
-  const cedulaValue = target?.value ?? '';
-  updateField('cedula', cedulaValue);
-  handleValidation('cedula', cedulaValue.length > 0);
-};
-
-// Función de validación para el email que devuelve un objeto con value e isValid
 const validateEmailInput = (event: Event) => {
   return validateEmailInRealTime(event);
 };
 
-// Inicializar nombres y apellidos si ya existe un nombre completo
-onMounted(() => {
-  const initializeNames = () => {
-    if (data.value.name) {
-      const nameParts = data.value.name.split(' ');
-      if (nameParts.length > 1) {
-        // El último elemento es el apellido, el resto son nombres
-        apellidos.value = nameParts.pop() || '';
-        nombres.value = nameParts.join(' ');
-      } else if (nameParts.length === 1) {
-        nombres.value = nameParts[0];
-      }
-      
-      console.log("Inicializado con:", {
-        nombreCompleto: data.value.name,
-        nombres: nombres.value,
-        apellidos: apellidos.value
-      });
-    }
-  };
-
-  initializeNames();
+// Mantener el tipo de documento sincronizado con el objeto
+watch(documentType, (val) => {
+  updateField('documentType', val);
 });
 
-// Observar cambios en nombres y apellidos para actualizar el nombre completo
-watch([nombres, apellidos], () => {
-  if (nombres.value || apellidos.value) {
-    updateFullName();
+// Inicializar el tipo de documento desde el objeto si existe
+onMounted(() => {
+  if (data.value.documentType) {
+    documentType.value = data.value.documentType;
   }
-}, { immediate: true });
+});
 
 const billDataRef = ref<HTMLElement | null>(null);
 defineExpose({
   billDataRef,
   data,
-  updateField,
-  setNombres: (val: string) => { nombres.value = val; },
-  setApellidos: (val: string) => { apellidos.value = val; }
+  updateField
 });
 </script>
 
