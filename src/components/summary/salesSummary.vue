@@ -53,8 +53,12 @@
                 <span class="item-value">{{ salesData.payment.transferData.financialInstitution }}</span>
               </div>
               <div class="summary-item">
-                <span class="item-label">Comprobante:</span>
+                <span class="item-label">Número de Comprobante:</span>
                 <span class="item-value">{{ truncateText(salesData.payment.transferData.proofPayment, 20) }}</span>
+              </div>
+              <div class="summary-item">
+                <span class="item-label">Número de Lote:</span>
+                <span class="item-value">{{ salesData.payment.transferData.numberLote }}</span>
               </div>
             </template>
             
@@ -62,6 +66,10 @@
               <div class="summary-item">
                 <span class="item-label">Tipo de Tarjeta:</span>
                 <span class="item-value">{{ salesData.payment.datafastData.typeCard }}</span>
+              </div>
+              <div class="summary-item">
+                <span class="item-label">Número de Comprobante:</span>
+                <span class="item-value">{{ salesData.payment.datafastData.proofPayment }}</span>
               </div>
               <div class="summary-item">
                 <span class="item-label">Número de Lote:</span>
@@ -107,11 +115,13 @@ const salesData = ref({
       date: "",
       transferData: {
         financialInstitution: "",
-        proofPayment: ""
+        proofPayment: "",
+        numberLote: "",
       },
       datafastData: {
         typeCard: "",
-        numberLote: ""
+        proofPayment: "",
+        numberLote: "",
       }
     }
   });
