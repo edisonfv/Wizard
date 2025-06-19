@@ -62,27 +62,13 @@
                 required
                 @input="handleEmailInput"
                 @validation="(isValid) => handleValidation('email', isValid)"
-                :validator="validateEmailInput"
                 errorMessage="Por favor, ingrese un correo electrónico válido"
               />
             </form>
           </div>
-          <!-- Mostrar formulario de facturación si el email es válido -->
           <div v-if="validationState.email && data.email" style="position:relative;">
             <BillDataForm ref="billDataFormRef" @validation="handleBillValidation" />
-            <!-- Modal flotante centrado sobre el formulario de facturación -->
-            <div v-if="showCopyModal" class="modal-overlay-bill">
-              <div class="modal-content">
-                <p>¿Desea utilizar los mismos datos para la facturación?</p>
-                <div class="modal-actions">
-                  <button class="modal-btn yes" @click="onCopyYes">Sí</button>
-                  <button class="modal-btn no" @click="onCopyNo">No</button>
-                </div>
-              </div>
-            </div>
           </div>
-          <!-- Botón Siguiente controlado por canContinue -->
-          <!-- Eliminado el botón interno de Siguiente para que solo quede el principal -->
         </div>
       </ion-card-content>
     </ion-card>
@@ -90,7 +76,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted, nextTick, computed, defineEmits } from 'vue';
+import { ref, computed, watch, defineEmits, nextTick, onMounted } from 'vue';
 import autoAnimate from '@formkit/auto-animate';
 import {
   IonCard,
@@ -104,14 +90,6 @@ import {
 } from "@/utils/input-controls";
 import BillDataForm from './billData.vue';
 
-// Modal flotante para preguntar si se usan los mismos datos
-const showCopyModal = ref(false);
-const modalAnswered = ref(false);
-
-// Flag para evitar que la copia/limpieza se ejecute más de una vez
-const alreadyAnsweredModal = ref(false);
-
-// Valores iniciales para el formulario
 const initialValues = {
   id: "",
   name: "",
@@ -119,94 +97,70 @@ const initialValues = {
   email: "",
 };
 
-// Usar el composable useInitialData para manejar los datos
 const { data, updateField } = useInitialData(
   "createUser",
   initialValues,
   {
     autoSave: true,
-    debug: true // Activar debug para ver los logs
+    debug: false // Desactivar logs innecesarios
   }
 );
 
-// Variables locales para nombres y apellidos
 const nombres = ref("");
 const apellidos = ref("");
 const billDataFormRef = ref<any>(null);
 const billSectionParent = ref<HTMLElement | null>(null);
 
-// Definir un tipo para las claves de validación
-// Ahora incluye 'id', 'name', 'lastName', 'phone', 'email'
 type ValidationKey = 'id' | 'name' | 'lastName' | 'phone' | 'email';
-
-// Estado para validación de campos con tipo explícito
 const validationState = ref<Record<ValidationKey, boolean>>({
-  id: true,
-  name: true,
-  lastName: true,
-  phone: true,
-  email: true
+  id: false,
+  name: false,
+  lastName: false,
+  phone: false,
+  email: false
 });
 
-// Estado para la validez del formulario de facturación
+const isPersonalValid = computed(() => Object.values(validationState.value).every(Boolean));
 const isBillValid = ref(false);
 
-// Estado para saber si el formulario de facturación está completo
-const isBillComplete = ref(false);
-
-// Computada para la validez del formulario de datos personales
-const isPersonalValid = computed(() => Object.values(validationState.value).every(Boolean));
-
-// Computada global para el botón Siguiente
-const canContinue = computed(() => isPersonalValid.value && isBillValid.value && isBillComplete.value);
-
-// Emitir evento al padre cuando cambia canContinue
 const emit = defineEmits(['step-valid']);
-watch(canContinue, (val) => {
-  emit('step-valid', val);
-}, { immediate: true });
+const emitStepValid = () => {
+  emit('step-valid', isPersonalValid.value && isBillValid.value);
+};
+watch([isPersonalValid, isBillValid], emitStepValid, { immediate: true });
 
-// Función para manejar eventos de validación con tipos correctos
 const handleValidation = (field: ValidationKey, isValid: boolean) => {
   validationState.value[field] = isValid;
 };
 
-// Función para actualizar el nombre completo
 const updateFullName = () => {
-  // Concatenar nombres y apellidos with un espacio entre ellos
   const fullName = `${nombres.value} ${apellidos.value}`.trim();
-  
-  // Actualizar el campo name en el objeto data
   updateField('name', fullName);
-  
-  console.log("Nombre completo actualizado:", fullName);
+  data.value.name = fullName;
 };
 
-// Manejadores de eventos para los inputs con validación
 const handleNameInput = (event: Event) => {
   nombres.value = allowOnlyLetters(event);
-  // Actualizar el nombre completo después de cambiar el nombre
   nextTick(() => {
     updateFullName();
+    handleValidation('name', nombres.value.length > 0);
   });
 };
 
 const handleLastInput = (event: Event) => {
   apellidos.value = allowOnlyLetters(event);
-  // Actualizar el nombre completo después de cambiar el apellido
   nextTick(() => {
     updateFullName();
+    handleValidation('lastName', apellidos.value.length > 0);
   });
 };
 
 const handleEmailInput = (event: Event) => {
-  // Usar la función de validación en tiempo real
   const result = validateEmailInRealTime(event);
   updateField('email', result.value);
   handleValidation('email', result.isValid);
 };
 
-// Manejador para el input de cédula (ahora id)
 const handleIdInput = (event: Event) => {
   const target = event.target as HTMLInputElement | null;
   const idValue = target?.value ?? '';
@@ -214,7 +168,6 @@ const handleIdInput = (event: Event) => {
   handleValidation('id', idValue.length > 0);
 };
 
-// Manejador para el input de teléfono
 const handlePhoneInput = (event: Event) => {
   const target = event.target as HTMLInputElement | null;
   const phoneValue = target?.value ?? '';
@@ -222,32 +175,23 @@ const handlePhoneInput = (event: Event) => {
   handleValidation('phone', phoneValue.length > 0);
 };
 
-// Función de validación para el email que devuelve un objeto con value e isValid
-const validateEmailInput = (event: Event) => {
-  return validateEmailInRealTime(event);
+
+const handleBillValidation = (val: boolean) => {
+  isBillValid.value = val;
 };
 
-// Inicializar nombres y apellidos si ya existe un nombre completo
 onMounted(() => {
   const initializeNames = () => {
     if (data.value.name) {
       const nameParts = data.value.name.split(' ');
       if (nameParts.length > 1) {
-        // El último elemento es el apellido, el resto son nombres
         apellidos.value = nameParts.pop() || '';
         nombres.value = nameParts.join(' ');
       } else if (nameParts.length === 1) {
         nombres.value = nameParts[0];
       }
-      
-      console.log("Inicializado con:", {
-        nombreCompleto: data.value.name,
-        nombres: nombres.value,
-        apellidos: apellidos.value
-      });
     }
   };
-
   initializeNames();
   if (billSectionParent.value) {
     autoAnimate(billSectionParent.value, {
@@ -257,108 +201,16 @@ onMounted(() => {
   }
 });
 
-// Observar cambios en nombres y apellidos para actualizar el nombre completo
 watch([nombres, apellidos], () => {
   if (nombres.value || apellidos.value) {
-    updateFullName();
+    nextTick(() => {
+      updateFullName();
+    });
   }
-}, { immediate: true });
-
-// Función para copiar datos a billData.vue
-const copyPersonalToBill = () => {
-  const billRef = billDataFormRef.value;
-  if (billRef && billRef.data && billRef.updateField) {
-    billRef.updateField('documentNumber', data.value.id); // Asegúrate de usar 'documentNumber'
-    billRef.updateField('name', data.value.name);
-    billRef.updateField('email', data.value.email);
-    billRef.updateField('phone', data.value.phone); // Copia el teléfono
-    // No tocar manualmente isBillComplete aquí
-  }
-};
-
-// Función para limpiar datos de billData.vue
-const clearBillData = () => {
-  const billRef = billDataFormRef.value;
-  if (billRef && billRef.data && billRef.updateField) {
-    billRef.updateField('documentNumber', '');
-    billRef.updateField('name', '');
-    billRef.updateField('email', '');
-    billRef.updateField('phone', '');
-    // No tocar manualmente isBillComplete aquí
-  }
-};
-
-// Métodos para manejar el click del modal
-const onCopyYes = () => {
-  if (!alreadyAnsweredModal.value) {
-    copyPersonalToBill();
-    alreadyAnsweredModal.value = true;
-  }
-  showCopyModal.value = false;
-  modalAnswered.value = true;
-};
-
-const onCopyNo = () => {
-  if (!alreadyAnsweredModal.value) {
-    clearBillData();
-    alreadyAnsweredModal.value = true;
-  }
-  showCopyModal.value = false;
-  modalAnswered.value = true;
-};
-
-// Mostrar el modal cuando el email es válido y no se ha respondido
-watch(
-  () => validationState.value.email && data.value.email,
-  (show) => {
-    if (show && !modalAnswered.value && !alreadyAnsweredModal.value) {
-      showCopyModal.value = true;
-    }
-    if (show) {
-      nextTick(() => {
-        const el = billDataFormRef.value?.billDataRef;
-        if (el && el.scrollIntoView) {
-          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      });
-    }
-  }
-);
-
-// Función para verificar si todos los campos requeridos de billData están completos
-defineExpose({
-  // ...existing code...
-});
-
-// Escuchar el evento de validación del formulario de facturación y verificar si todos los campos están completos
-const handleBillValidation = (val: boolean) => {
-  isBillValid.value = val;
-  updateBillComplete();
-};
-
-// Nueva función: observar los datos de billData y actualizar isBillComplete
-const updateBillComplete = () => {
-  const billRef = billDataFormRef.value;
-  if (billRef && billRef.data && billRef.data.value) {
-    const bill = billRef.data.value;
-    isBillComplete.value = !!bill.documentNumber && !!bill.name && !!bill.phone && !!bill.email;
-  } else {
-    isBillComplete.value = false;
-  }
-};
-
-// Observar cambios en los datos de billData para actualizar isBillComplete
-watch(
-  () => billDataFormRef.value?.data?.value,
-  () => {
-    updateBillComplete();
-  },
-  { deep: true }
-);
+}, { immediate: false });
 </script>
 
 <style scoped>
-/* Los estilos se mantienen igual */
 .main-container {
   width: 100%;
   max-width: 100%;
@@ -377,7 +229,6 @@ watch(
   }
 }
 
-/* Estilos para la tarjeta principal */
 .wizard-card {
   width: 100%;
   margin: 0;
@@ -390,7 +241,6 @@ watch(
   padding: 10px;
 }
 
-/* Contenedor de sección con estilos comunes */
 .section-container {
   background-color: #f0f7ff;
   border-radius: 8px;
@@ -398,13 +248,11 @@ watch(
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 }
 
-/* Contenedor del encabezado */
 .header-container {
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
   padding-bottom: 10px;
 }
 
-/* Título de sección */
 .section-title {
   font-size: 1.1rem;
   font-weight: 600;
@@ -412,7 +260,6 @@ watch(
   margin-bottom: 5px;
 }
 
-/* Subtítulo de sección */
 .section-subtitle {
   font-size: 0.9rem;
   font-weight: 400;
@@ -421,12 +268,10 @@ watch(
   margin-bottom: 0;
 }
 
-/* Contenedor del formulario */
 .form-container {
   width: 100%;
 }
 
-/* Fila de formulario para elementos en línea */
 .form-row {
   display: flex;
   gap: 12px;
@@ -439,59 +284,9 @@ watch(
   }
 }
 
-/* Estilos para el contenido */
 .wizard-content {
   flex: 1;
   overflow-y: auto;
   height: 100%;
-}
-
-/* Estilos para el modal flotante */
-.modal-overlay-bill {
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.25);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 100;
-}
-.modal-content {
-  background: #fff;
-  border-radius: 12px;
-  padding: 2rem 1.5rem 1.5rem 1.5rem;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
-  min-width: 320px;
-  max-width: 90vw;
-  text-align: center;
-}
-.modal-actions {
-  display: flex;
-  justify-content: center;
-  gap: 1.5rem;
-  margin-top: 1.5rem;
-}
-.modal-btn {
-  padding: 0.5rem 1.5rem;
-  border-radius: 8px;
-  border: none;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s, color 0.2s;
-}
-.modal-btn.yes {
-  background: #2563eb;
-  color: #fff;
-}
-.modal-btn.no {
-  background: #f3f4f6;
-  color: #333;
-}
-.modal-btn.yes:hover {
-  background: #1746a2;
-}
-.modal-btn.no:hover {
-  background: #e0e7ef;
 }
 </style>

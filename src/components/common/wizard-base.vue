@@ -30,6 +30,7 @@
               v-if="currentStepComponent" 
               :is="currentStepComponent" 
               @step-valid="onStepValid"
+              :key="currentStepKey"
             />
           </template>
         </div>
@@ -126,13 +127,14 @@ const showConfirmationModal = ref(false)
 // Variable para controlar la visibilidad del modal de confirmación de ventas
 const showSalesConfirmationModal = ref(false)
 
-// Estado para controlar la validez del paso actual (por ejemplo, datos personales y facturación)
-const isCurrentStepValid = ref(true); // Por defecto true para otros pasos, pero el hijo lo actualizará
+// Variable reactiva local
+const isCurrentStepValid = ref(false)
 
-// Handler para el evento de validez del paso
-const onStepValid = (val: boolean) => {
-  isCurrentStepValid.value = val;
-};
+// Función que maneja el evento del componente
+const onStepValid = (isValid: boolean) => {
+  console.log('📡 Evento step-valid recibido:', isValid)
+  isCurrentStepValid.value = isValid
+}
 
 // Inicializamos el wizard con el tipo proporcionado y la configuración de sub-pasos
 const {

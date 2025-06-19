@@ -81,7 +81,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted, defineExpose, defineEmits } from 'vue';
+import { ref, watch, onMounted, defineExpose, defineEmits, computed } from 'vue';
 import FormField from "@/components/ui/FormField.vue";
 import { useInitialData } from "@/composables/useInitialData";
 import { validateEmailInRealTime } from "@/utils/input-controls";
@@ -101,7 +101,7 @@ const { data, updateField } = useInitialData(
   initialValues,
   {
     autoSave: true,
-    debug: true
+    debug: false
   }
 );
 
@@ -111,13 +111,15 @@ const documentType = ref('cedula');
 // Estado para validación de campos
 // Ajustado a la nueva estructura
 const validationState = ref({
-  documentNumber: true,
-  name: true,
-  phone: true,
-  email: true
+  documentNumber: false,
+  name: false,
+  phone: false,
+  email: false
 });
 
 const emit = defineEmits(['validation']);
+const isFormValid = computed(() => Object.values(validationState.value).every(Boolean));
+watch(isFormValid, (val) => emit('validation', val), { immediate: true });
 
 const handleValidation = (field: keyof typeof validationState.value, isValid: boolean) => {
   validationState.value[field] = isValid;
@@ -165,12 +167,6 @@ onMounted(() => {
     documentType.value = data.value.documentType;
   }
 });
-
-// Emitir evento de validación global cada vez que cambie el estado
-watch(validationState, () => {
-  // Emitimos un booleano, no un ref
-  emit('validation', Object.values(validationState.value).every(Boolean));
-}, { deep: true, immediate: true });
 
 const billDataRef = ref<HTMLElement | null>(null);
 defineExpose({

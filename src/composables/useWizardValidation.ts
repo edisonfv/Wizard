@@ -36,7 +36,8 @@ export function useWizardValidation() {
         return validateDataSalesStep(currentSubStep)
       
       case 'personal-info':
-        return validatePersonalInfoStep()
+        // La validación de este paso se maneja localmente en el componente
+        return false
       
       case 'config-company':
         return validateConfigCompanyStep(currentSubStep)
@@ -107,21 +108,6 @@ export function useWizardValidation() {
     return false // Para otros subpasos no definidos
   }
   
-
-  /**
-   * Valida el paso de información personal
-   */
-  const validatePersonalInfoStep = (): boolean => {
-    const createUser = wizardStore.getStepData('createUser')
-
-    // Verificar si existe el objeto createUser
-    if (!createUser) {
-      return true
-    }
-
-    // Verificar campos requeridos
-    return !createUser.name || !createUser.email || !createUser.rol?.name
-  }
 
   /**
    * Valida el paso de configuración de la empresa según el subpaso
