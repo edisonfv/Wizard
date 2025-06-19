@@ -289,19 +289,20 @@ const handleCancelFinish = () => {
 
 // Maneja la lógica de navegación "anterior"
 const handlePrevious = () => {
+  // Si estamos en el substep 1 de data-sales (planes) y vamos hacia atrás, limpiamos solo aquí
+  if (currentStepKey.value === "data-sales" && currentSubStepIndex.value === 0) {
+    wizardStore.resetCompanyCreation();
+  }
   // Usamos el nuevo método previous() para manejar la navegación hacia atrás
   const result = previous();
-  
   // Si result es false, significa que estamos en el primer paso y no podemos retroceder más
   if (!result) {
     console.log("No se puede retroceder más, estamos en el primer paso");
   }
-  
   // Actualizar el subpaso en el store
   wizardStore.updateWizardState({
     currentSubStep: currentSubStepIndex.value + 1,
   });
-
   // Mostrar el estado completo en consola
   console.log("Wizard state actualizado (handlePrevious):", {
     wizardState: wizardStore.getCurrentWizardState,
