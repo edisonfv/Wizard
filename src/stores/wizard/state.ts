@@ -33,6 +33,12 @@ export const initialState = (): WizardInterface => ({
       address: "",
       phone: "",
       businessEmail: "",
+      status: "", // Nuevo campo
+      regimeRUC: "", // Nuevo campo
+      isAgent: false, // Nuevo campo
+      accountingRequired: false, // Nuevo campo
+      categoryRUC: "", // Nuevo campo
+      branches: [], // Nuevo campo: array de sucursales
     },
     salesData: {
       // Datos generales de la venta

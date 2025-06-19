@@ -131,7 +131,15 @@ const companyCreationInitial = {
   ruc: "",
   legalName: "",
   domain: "",
-  address: ""
+  address: "",
+  phone: "",
+  businessEmail: "",
+  status: "",
+  regimeRUC: "",
+  isAgent: false,
+  accountingRequired: false,
+  categoryRUC: "",
+  branches: []
 }
 
 // Inicializar los datos para branchAndPOS
@@ -139,8 +147,14 @@ const branchAndPOSInitial = {
   branch: {
     idBranch: "",
     commercialName: "",
-    address: ""
-  }
+    address: "",
+    phone: "",
+    email: "",
+    isTouristEstablishment: false,
+    delayedDispatch: false,
+    logo: { url: '', fileName: '' }
+  },
+  pointOfSale: { idPos: '', name: '' }
 }
 
 // Inicializar los datos para companyConfig
@@ -150,7 +164,12 @@ const companyConfigInitial = {
   taxAgent: {
     isAgent: false,
     accountingRequired: false
-  }
+  },
+  artisan: { isArtisan: false, artisanNumber: '' },
+  taxes: [],
+  taxesFiveNumber: '',
+  defaultDocument: '',
+  searchParameter: ''
 }
 
 // Usar el composable useInitialData para cada sección
@@ -160,7 +179,7 @@ const { data: companyCreationData, updateFields: updateCompanyCreation } = useIn
   { autoSave: true }
 )
 
-const { data: branchAndPOSData, updateFields: updateBranchAndPOS } = useInitialData(
+const { updateFields: updateBranchAndPOS } = useInitialData(
   "branchAndPOS",
   branchAndPOSInitial,
   { 
@@ -273,23 +292,40 @@ const updateStoreWithSRIData = (data: any) => {
     console.log("Solo se guardó el RUC en modo Sin RUC:", { ruc: data.ruc });
     return;
   }
-  // Actualizar los datos de companyCreation
+
+  // Tomar la primera sucursal del array branches
+  const firstBranch = data.branches && data.branches.length > 0 ? data.branches[0] : { idBranch: '', commercialName: '', address: '' };
+
+  // Actualizar los datos de companyCreation con todos los campos relevantes
   updateCompanyCreation({
     ruc: data.ruc,
     legalName: data.legalName,
     domain: data.ruc,
-    address: data.address
-  })
+    address: firstBranch.address || '',
+    phone: '',
+    businessEmail: '',
+    status: data.status,
+    regimeRUC: data.regimeRUC,
+    isAgent: data.isAgent,
+    accountingRequired: data.accountingRequired,
+    categoryRUC: data.categoryRUC,
+    branches: data.branches || []
+  });
 
-  // Actualizar los datos de branchAndPOS
+  // Actualizar los datos de branchAndPOS solo con la primera sucursal
   updateBranchAndPOS({
     branch: {
-      ...branchAndPOSData.value.branch,
-      idBranch: data.idBranch,
-      commercialName: data.commercialName,
-      address: data.address
-    }
-  })
+      idBranch: firstBranch.idBranch || '',
+      commercialName: firstBranch.commercialName || '',
+      address: firstBranch.address || '',
+      phone: '',
+      email: '',
+      isTouristEstablishment: false,
+      delayedDispatch: false,
+      logo: { url: '', fileName: '' }
+    },
+    pointOfSale: { idPos: '', name: '' }
+  });
 
   // Actualizar los datos de companyConfig
   updateCompanyConfig({
@@ -298,21 +334,28 @@ const updateStoreWithSRIData = (data: any) => {
     taxAgent: {
       ...companyConfigData.value.taxAgent,
       isAgent: data.isAgent,
-      accountingRequired: data.accountingRequired
-    }
-  })
+      accountingRequired: data.accountingRequired,
+    },
+    artisan: { isArtisan: false, artisanNumber: '' },
+    taxes: [],
+    taxesFiveNumber: '',
+    defaultDocument: '',
+    searchParameter: ''
+  });
 
   console.log("Datos actualizados en el store desde searchRUC:", {
     companyCreation: {
       ruc: data.ruc,
       legalName: data.legalName,
+      status: data.status,
+      regimeRUC: data.regimeRUC,
+      isAgent: data.isAgent,
+      accountingRequired: data.accountingRequired,
+      categoryRUC: data.categoryRUC,
+      branches: data.branches
     },
     branchAndPOS: {
-      branch: {
-        idBranch: data.idBranch,
-        commercialName: data.commercialName,
-        address: data.address,
-      },
+      branch: firstBranch
     },
     companyConfig: {
       regimeRUC: data.regimeRUC,
@@ -322,7 +365,7 @@ const updateStoreWithSRIData = (data: any) => {
         accountingRequired: data.accountingRequired,
       },
     }
-  })
+  });
 }
 
 const searchRuc = async () => {
@@ -370,6 +413,7 @@ const searchRuc = async () => {
       updateCompanyCreation({ ruc: rucValue.value });
       rucIsValid.value = true;
       emit("ruc-valid-for-continue", rucValue.value);
+      emit("step-valid", true); // <-- Emitir evento para activar el botón siguiente
       isLoading.value = false;
       return;
     }
@@ -383,9 +427,11 @@ const searchRuc = async () => {
       if (foundRuc.status === "ACTIVO") {
         // Marcar como RUC válido solo si está ACTIVO
         rucIsValid.value = true
+        emit("step-valid", true); // <-- Emitir evento para activar el botón siguiente
       } else {
         // Si el RUC existe pero no está ACTIVO, no lo consideramos válido
         rucIsValid.value = false
+        emit("step-valid", false);
       }
       // Actualizar el store con los datos encontrados
       updateStoreWithSRIData(foundRuc)
@@ -401,6 +447,7 @@ const searchRuc = async () => {
       console.log("RUC no encontrado:", rucValue.value)
       // Asegurar que el RUC no válido
       rucIsValid.value = false
+      emit("step-valid", false);
       // Emitir el evento de RUC no encontrado
       emit("ruc-not-found", rucValue.value)
     }

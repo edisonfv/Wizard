@@ -22,13 +22,25 @@ export interface Consultant {
 }
 
 // Interfaces para la creación de la empresa
+export interface Branch {
+  idBranch: string;
+  commercialName: string;
+  address: string;
+}
+
 export interface CompanyCreation {
-  ruc: string
-  legalName: string
-  domain: string
-  address: string
-  phone: string
-  businessEmail: string
+  ruc: string;
+  legalName: string;
+  domain: string;
+  address: string;
+  phone: string;
+  businessEmail: string;
+  status?: string; // ACTIVO, SUSPENDIDO, etc.
+  regimeRUC?: string;
+  isAgent?: boolean;
+  accountingRequired?: boolean;
+  categoryRUC?: string;
+  branches?: Branch[];
 }
 
 // Interfaces para datos de venta

@@ -14,7 +14,12 @@
         </ion-card-header>
         
         <ion-card-content class="search-section">
-          <searchRUC @ruc-searched="handleRucSearched" @ruc-not-found="handleRucNotFound" @ruc-valid-for-continue="handleRucValidForContinue" />
+          <searchRUC 
+            @ruc-searched="handleRucSearched" 
+            @ruc-not-found="handleRucNotFound" 
+            @ruc-valid-for-continue="handleRucValidForContinue"
+            @step-valid="onStepValid"
+          />
         </ion-card-content>
       </ion-card>
 
@@ -33,7 +38,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, defineEmits } from 'vue';
 import { IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonCardSubtitle } from '@ionic/vue'
 import { Icon } from '@iconify/vue';
 import searchRUC from "./components/searchRUC.vue";
@@ -52,6 +57,9 @@ const rucData = ref({
   razonSocial: '',
   estado: ''
 });
+
+// Emitir el evento hacia el padre (wizard-base.vue)
+const emit = defineEmits(["step-valid"]);
 
 // Función que se ejecuta cuando se encuentra un RUC
 const handleRucSearched = (data: any) => {
@@ -92,6 +100,11 @@ const handleRucValidForContinue = (rucNumber: string) => {
   rucValidForContinue.value = true;
   // Mostrar el componente informationRUC con mensaje de error
   showRucInfo.value = true;
+};
+
+// Función para propagar el evento step-valid
+const onStepValid = (isValid: boolean) => {
+  emit("step-valid", isValid);
 };
 </script>
 

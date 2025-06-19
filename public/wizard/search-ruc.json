@@ -8,9 +8,28 @@
       "isAgent": true,
       "accountingRequired": true,
       "categoryRUC": "Negocio Popular",
-      "idBranch": "001",
-      "commercialName": "Wanqara",
-      "address": "PICHINCHA / QUITO / IÑAQUITO / 10 DE AGOSTO N33-62 Y N33 GUAYANAS"
+      "branches": [
+        {
+          "idBranch": "001",
+          "commercialName": "Wanqara",
+          "address": "PICHINCHA / QUITO / IÑAQUITO / 10 DE AGOSTO N33-62 Y N33 GUAYANAS"
+        },
+        {
+          "idBranch": "002",
+          "commercialName": "Wanqara Norte",
+          "address": "PICHINCHA / QUITO / LA CAROLINA / AV. AMAZONAS N34-56"
+        },
+        {
+          "idBranch": "003",
+          "commercialName": "Wanqara Sur",
+          "address": "PICHINCHA / QUITO / QUITUMBE / AV. PEDRO VICENTE MALDONADO 123"
+        },
+        {
+          "idBranch": "004",
+          "commercialName": "Wanqara Cumbayá",
+          "address": "PICHINCHA / QUITO / CUMBAYÁ / AV. INTEROCEÁNICA KM 10"
+        }
+      ]
     },
     {
       "ruc": "1790016919001",
@@ -20,9 +39,23 @@
       "isAgent": true,
       "accountingRequired": true,
       "categoryRUC": "Contribuyente Especial",
-      "idBranch": "001",
-      "commercialName": "Supermaxi",
-      "address": "PICHINCHA / QUITO / CUMBAYÁ / AV. INTEROCEÁNICA KM 12.5 Y PASAJE BERMEJO"
+      "branches": [
+        {
+          "idBranch": "001",
+          "commercialName": "Supermaxi",
+          "address": "PICHINCHA / QUITO / CUMBAYÁ / AV. INTEROCEÁNICA KM 12.5 Y PASAJE BERMEJO"
+        },
+        {
+          "idBranch": "002",
+          "commercialName": "Supermaxi Centro",
+          "address": "PICHINCHA / QUITO / CENTRO / CALLE GARCÍA MORENO 123"
+        },
+        {
+          "idBranch": "003",
+          "commercialName": "Supermaxi Sur",
+          "address": "PICHINCHA / QUITO / QUITUMBE / AV. MORÁN VALVERDE 456"
+        }
+      ]
     },
     {
       "ruc": "1791251237001",
@@ -32,9 +65,23 @@
       "isAgent": true,
       "accountingRequired": true,
       "categoryRUC": "Contribuyente Especial",
-      "idBranch": "001",
-      "commercialName": "PRONACA",
-      "address": "PICHINCHA / QUITO / TUMBACO / VÍA INTEROCEÁNICA KM 21"
+      "branches": [
+        {
+          "idBranch": "001",
+          "commercialName": "PRONACA",
+          "address": "PICHINCHA / QUITO / TUMBACO / VÍA INTEROCEÁNICA KM 21"
+        },
+        {
+          "idBranch": "002",
+          "commercialName": "PRONACA Sur",
+          "address": "GUAYAS / GUAYAQUIL / SUR / AV. 25 DE JULIO 456"
+        },
+        {
+          "idBranch": "003",
+          "commercialName": "PRONACA Los Chillos",
+          "address": "PICHINCHA / RUMIÑAHUI / LOS CHILLOS / AV. ILALÓ 789"
+        }
+      ]
     },
     {
       "ruc": "0992757892001",
@@ -44,9 +91,18 @@
       "isAgent": true,
       "accountingRequired": true,
       "categoryRUC": "Contribuyente Especial",
-      "idBranch": "001",
-      "commercialName": "Mi Comisariato",
-      "address": "GUAYAS / GUAYAQUIL / TARQUI / AV. 9 DE OCTUBRE 729 Y BOYACÁ"
+      "branches": [
+        {
+          "idBranch": "001",
+          "commercialName": "Mi Comisariato",
+          "address": "GUAYAS / GUAYAQUIL / TARQUI / AV. 9 DE OCTUBRE 729 Y BOYACÁ"
+        },
+        {
+          "idBranch": "002",
+          "commercialName": "Mi Comisariato Norte",
+          "address": "GUAYAS / GUAYAQUIL / NORTE / AV. FRANCISCO DE ORELLANA 789"
+        }
+      ]
     },
     {
       "ruc": "1791410726001",
@@ -56,9 +112,23 @@
       "isAgent": false,
       "accountingRequired": true,
       "categoryRUC": "Sociedad",
-      "idBranch": "001",
-      "commercialName": "Tecnomega",
-      "address": "PICHINCHA / QUITO / LA CONCEPCIÓN / AV. REPÚBLICA E2-51 Y ATAHUALPA"
+      "branches": [
+        {
+          "idBranch": "001",
+          "commercialName": "Tecnomega",
+          "address": "PICHINCHA / QUITO / LA CONCEPCIÓN / AV. REPÚBLICA E2-51 Y ATAHUALPA"
+        },
+        {
+          "idBranch": "002",
+          "commercialName": "Tecnomega Matriz",
+          "address": "PICHINCHA / QUITO / CENTRO NORTE / AV. COLÓN 1234"
+        },
+        {
+          "idBranch": "003",
+          "commercialName": "Tecnomega Sur",
+          "address": "PICHINCHA / QUITO / QUITUMBE / AV. TENIENTE HUGO ORTIZ 321"
+        }
+      ]
     }
   ]
 }
