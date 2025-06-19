@@ -13,27 +13,27 @@
           @validation="(isValid) => handleValidation('idPos', isValid)"
         />
       </div>
-      <!-- Nombre del Punto de Venta -->
+      <!-- Nombre del Punto de Venta (variable local, no se guarda en el objeto) -->
       <div class="input-col input-col-2">
         <FormField
-          v-model="data.pointOfSale.name"
+          v-model="localPosName"
           label="Nombre"
           icon="mdi:store"
           placeholder="Nombre"
           required
-          @validation="(isValid) => handleValidation('name', isValid)"
+          @validation="(isValid) => handleValidation('localPosName', isValid)"
         />
       </div>
     </div>
-    <!-- Input de Nombre Final -->
+    <!-- Input de Nombre Final (se guarda en name del objeto) -->
     <div class="full-row">
       <FormField
-        v-model="data.pointOfSale.finalName"
+        v-model="data.pointOfSale.name"
         label="Nombre del Punto de Emisión"
         icon="mdi:store"
         placeholder="Nombre a guardar"
         required
-        @validation="(isValid) => handleValidation('finalName', isValid)"
+        @validation="(isValid) => handleValidation('name', isValid)"
       />
     </div>
   </form>
@@ -49,8 +49,7 @@ import { useInitialData } from "@/composables/useInitialData";
 const initialValues = {
   pointOfSale: {
     idPos: '',
-    name: '',
-    finalName: ''
+    name: ''
   }
 };
 
@@ -62,19 +61,22 @@ const { data } = useInitialData(
     autoSave: true,
     debug: false,
     nestedFields: {
-      pointOfSale: ["idPos", "name", "finalName"]
+      pointOfSale: ["idPos", "name"]
     }
   }
 );
 
+// Variable local para el nombre del punto de venta
+const localPosName = ref('');
+
 // Definir un tipo para las claves de validación
-type ValidationKey = 'name' | 'idPos' | 'finalName';
+type ValidationKey = 'idPos' | 'name' | 'localPosName';
 
 // Estado para validación de campos con tipo explícito
 const validationState = ref<Record<ValidationKey, boolean>>({
-  name: true,
   idPos: true,
-  finalName: true
+  name: true,
+  localPosName: true
 });
 
 // Función para manejar eventos de validación con tipos correctos
@@ -89,20 +91,26 @@ onMounted(() => {
   }
 });
 
+// Watch para formar el nombre final y guardarlo en el objeto
 watch([
   () => data.value.pointOfSale.idPos,
-  () => data.value.pointOfSale.name
+  () => localPosName.value
 ], ([codigo, nombre]) => {
   if (codigo && nombre) {
-    data.value.pointOfSale.finalName = `${codigo} - ${nombre}`;
+    data.value.pointOfSale.name = `${codigo} - ${nombre}`;
   } else if (codigo) {
-    data.value.pointOfSale.finalName = `${codigo}`;
+    data.value.pointOfSale.name = `${codigo}`;
   } else if (nombre) {
-    data.value.pointOfSale.finalName = `${nombre}`;
+    data.value.pointOfSale.name = `${nombre}`;
   } else {
-    data.value.pointOfSale.finalName = '';
+    data.value.pointOfSale.name = '';
   }
 });
+
+// Watch para mostrar en consola los datos guardados en el lead cada vez que cambian
+watch(data, (nuevoValor) => {
+  console.log('[createPOS] Datos guardados en el lead:', JSON.parse(JSON.stringify(nuevoValor)));
+}, { deep: true });
 
 //const wizardStore = useWizardStore();
 //const sinRucActive = wizardStore.wizardState?.sinRucActive || false;

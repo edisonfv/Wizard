@@ -39,7 +39,7 @@
 
     <!-- Nombre de tu Sucursal (AUXILIAR) -->
     <FormField
-      v-model="data.branch.nameAux"
+      v-model="nameAux"
       label="Nombre"
       icon="mdi:home-city"
       placeholder="Nombre"
@@ -111,7 +111,6 @@ const initialValues = {
     commercialName: '',
     idBranch: '',
     name: '', // Este es el que se guarda en el lead
-    nameAux: '', // Auxiliar para el input editable
     address: '',
     phone: '',
     email: '',
@@ -209,10 +208,13 @@ watch(
   { immediate: true }
 );
 
+// Variable local para el nombre auxiliar (no se guarda en el lead)
+const nameAux = ref('');
+
 // Watch para actualizar el nombre de la matriz automáticamente
 watch([
   () => data.value.branch.idBranch,
-  () => data.value.branch.nameAux
+  () => nameAux.value
 ], ([codigo, nombreAux]) => {
   if (codigo && nombreAux) {
     data.value.branch.name = `${codigo} - ${nombreAux}`;
@@ -235,6 +237,25 @@ watch(selectedBranch, (val) => {
     data.value.branch.idBranch = '';
     data.value.branch.commercialName = '';
   }
+});
+
+// Watch para mostrar en consola los datos guardados en el lead cada vez que cambian
+watch(data, (nuevoValor) => {
+  console.log('[createSucursal] Datos guardados en el lead:', JSON.parse(JSON.stringify(nuevoValor)));
+  // Mostrar también el objeto completo de companyCreation
+  console.log('[createSucursal] companyCreation en el lead:', JSON.parse(JSON.stringify(wizardStore.getStepData('companyCreation'))));
+}, { deep: true });
+
+// Watch para sincronizar email y phone de branch en companyCreation
+watch([
+  () => data.value.branch.email,
+  () => data.value.branch.phone
+], ([nuevoEmail, nuevoPhone]) => {
+  // Actualiza los campos en companyCreation del store global
+  wizardStore.updateFormSection('companyCreation', {
+    businessEmail: nuevoEmail,
+    phone: nuevoPhone
+  });
 });
 </script>
 

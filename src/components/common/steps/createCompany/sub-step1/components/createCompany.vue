@@ -31,7 +31,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import FormField from "@/components/ui/FormField.vue";
 import { useInitialData } from "@/composables/useInitialData";
 import { 
@@ -41,7 +41,6 @@ import { useWizardStore } from "@/stores/wizardStore";
 // Valores iniciales para el formulario
 const initialValues = {
   ruc: '',
-  name: '',
   legalName: '',
   address: '',
   phone: '',
@@ -59,12 +58,11 @@ const { data } = useInitialData(
 );
 
 // Definir un tipo para las claves de validación
-type ValidationKey = 'ruc' | 'name' | 'legalName' | 'address' | 'phone' | 'businessEmail';
+type ValidationKey = 'ruc' | 'legalName' | 'address' | 'phone' | 'businessEmail';
 
 // Estado para validación de campos con tipo explícito
 const validationState = ref<Record<ValidationKey, boolean>>({
   ruc: true,
-  name: true,
   legalName: true,
   address: true,
   phone: true,
@@ -78,6 +76,11 @@ const handleValidation = (field: ValidationKey, isValid: boolean) => {
 
 const wizardStore = useWizardStore();
 const sinRucActive = wizardStore.wizardState?.sinRucActive || false;
+
+// Watch para mostrar en consola los datos guardados en el lead cada vez que cambian
+watch(data, (nuevoValor) => {
+  console.log('[createCompany] Datos guardados en el lead:', JSON.parse(JSON.stringify(nuevoValor)));
+}, { deep: true });
 
 </script>
 
