@@ -20,6 +20,7 @@
               <!-- Componente del sub-paso actual -->
               <component 
                 :is="currentSubStepComponent"
+                @step-valid="onStepValid"
               />
             </div>
           </template>
@@ -28,6 +29,7 @@
             <component 
               v-if="currentStepComponent" 
               :is="currentStepComponent" 
+              @step-valid="onStepValid"
             />
           </template>
         </div>
@@ -36,7 +38,7 @@
           <IonButton fill="outline" @click="handlePrevious" :disabled="shouldDisablePreviousButton">
             Anterior
           </IonButton>
-          <IonButton @click="handleNext" :disabled="shouldDisableNextButton">
+          <IonButton @click="handleNext" :disabled="!isCurrentStepValid || shouldDisableNextButton">
             {{ isLastStepAndSubStep ? 'Finalizado' : 'Siguiente' }}
           </IonButton>
         </div>
@@ -123,6 +125,14 @@ const showConfirmationModal = ref(false)
 
 // Variable para controlar la visibilidad del modal de confirmación de ventas
 const showSalesConfirmationModal = ref(false)
+
+// Estado para controlar la validez del paso actual (por ejemplo, datos personales y facturación)
+const isCurrentStepValid = ref(true); // Por defecto true para otros pasos, pero el hijo lo actualizará
+
+// Handler para el evento de validez del paso
+const onStepValid = (val: boolean) => {
+  isCurrentStepValid.value = val;
+};
 
 // Inicializamos el wizard con el tipo proporcionado y la configuración de sub-pasos
 const {

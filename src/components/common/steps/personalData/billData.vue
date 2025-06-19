@@ -81,7 +81,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted, defineExpose } from 'vue';
+import { ref, watch, onMounted, defineExpose, defineEmits } from 'vue';
 import FormField from "@/components/ui/FormField.vue";
 import { useInitialData } from "@/composables/useInitialData";
 import { validateEmailInRealTime } from "@/utils/input-controls";
@@ -116,6 +116,8 @@ const validationState = ref({
   phone: true,
   email: true
 });
+
+const emit = defineEmits(['validation']);
 
 const handleValidation = (field: keyof typeof validationState.value, isValid: boolean) => {
   validationState.value[field] = isValid;
@@ -163,6 +165,12 @@ onMounted(() => {
     documentType.value = data.value.documentType;
   }
 });
+
+// Emitir evento de validación global cada vez que cambie el estado
+watch(validationState, () => {
+  // Emitimos un booleano, no un ref
+  emit('validation', Object.values(validationState.value).every(Boolean));
+}, { deep: true, immediate: true });
 
 const billDataRef = ref<HTMLElement | null>(null);
 defineExpose({

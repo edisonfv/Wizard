@@ -69,7 +69,7 @@
           </div>
           <!-- Mostrar formulario de facturación si el email es válido -->
           <div v-if="validationState.email && data.email" style="position:relative;">
-            <BillDataForm ref="billDataFormRef" />
+            <BillDataForm ref="billDataFormRef" @validation="handleBillValidation" />
             <!-- Modal flotante centrado sobre el formulario de facturación -->
             <div v-if="showCopyModal" class="modal-overlay-bill">
               <div class="modal-content">
@@ -81,6 +81,8 @@
               </div>
             </div>
           </div>
+          <!-- Botón Siguiente controlado por canContinue -->
+          <!-- Eliminado el botón interno de Siguiente para que solo quede el principal -->
         </div>
       </ion-card-content>
     </ion-card>
@@ -88,7 +90,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted, nextTick } from 'vue';
+import { ref, watch, onMounted, nextTick, computed, defineEmits } from 'vue';
 import autoAnimate from '@formkit/auto-animate';
 import {
   IonCard,
@@ -143,6 +145,24 @@ const validationState = ref<Record<ValidationKey, boolean>>({
   email: true
 });
 
+// Estado para la validez del formulario de facturación
+const isBillValid = ref(false);
+
+// Estado para saber si el formulario de facturación está completo
+const isBillComplete = ref(false);
+
+// Computada para la validez del formulario de datos personales
+const isPersonalValid = computed(() => Object.values(validationState.value).every(Boolean));
+
+// Computada global para el botón Siguiente
+const canContinue = computed(() => isPersonalValid.value && isBillValid.value && isBillComplete.value);
+
+// Emitir evento al padre cuando cambia canContinue
+const emit = defineEmits(['step-valid']);
+watch(canContinue, (val) => {
+  emit('step-valid', val);
+}, { immediate: true });
+
 // Función para manejar eventos de validación con tipos correctos
 const handleValidation = (field: ValidationKey, isValid: boolean) => {
   validationState.value[field] = isValid;
@@ -150,7 +170,7 @@ const handleValidation = (field: ValidationKey, isValid: boolean) => {
 
 // Función para actualizar el nombre completo
 const updateFullName = () => {
-  // Concatenar nombres y apellidos con un espacio entre ellos
+  // Concatenar nombres y apellidos with un espacio entre ellos
   const fullName = `${nombres.value} ${apellidos.value}`.trim();
   
   // Actualizar el campo name en el objeto data
@@ -293,6 +313,24 @@ watch(
     }
   }
 );
+
+// Función para verificar si todos los campos requeridos de billData están completos
+defineExpose({
+  // ...existing code...
+});
+
+// Escuchar el evento de validación del formulario de facturación y verificar si todos los campos están completos
+const handleBillValidation = (val: boolean) => {
+  isBillValid.value = val;
+  // Verificar si todos los campos requeridos están llenos
+  const billRef = billDataFormRef.value;
+  if (billRef && billRef.data) {
+    const bill = billRef.data.value;
+    isBillComplete.value = !!bill.documentNumber && !!bill.name && !!bill.phone && !!bill.email;
+  } else {
+    isBillComplete.value = false;
+  }
+};
 </script>
 
 <style scoped>
