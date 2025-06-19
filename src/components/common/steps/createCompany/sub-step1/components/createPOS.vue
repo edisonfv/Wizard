@@ -47,6 +47,20 @@ import { useWizardStore } from "@/stores/wizardStore";
 
 // Valores iniciales para el formulario
 const initialValues = {
+  branch: {
+    idBranch: '',
+    name: '',
+    commercialName: '',
+    address: '',
+    phone: '',
+    email: '',
+    isTouristEstablishment: false,
+    delayedDispatch: false,
+    logo: {
+      url: '',
+      fileName: '',
+    },
+  },
   pointOfSale: {
     idPos: '',
     name: ''
@@ -94,14 +108,17 @@ onMounted(() => {
 // Watch para formar el nombre final y guardarlo en el objeto
 watch([
   () => data.value.pointOfSale.idPos,
-  () => localPosName.value
-], ([codigo, nombre]) => {
-  if (codigo && nombre) {
-    data.value.pointOfSale.name = `${codigo} - ${nombre}`;
-  } else if (codigo) {
-    data.value.pointOfSale.name = `${codigo}`;
+  () => localPosName.value,
+  () => data.value.branch?.idBranch // Agregamos el código de sucursal al watcher
+], ([codigo, nombre, codigoSucursal]) => {
+  if (codigo && nombre && codigoSucursal) {
+    data.value.pointOfSale.name = `${nombre} ${codigo} DE LA SUCURSAL ${codigoSucursal}`;
+  } else if (codigo && nombre) {
+    data.value.pointOfSale.name = `${nombre} ${codigo} DE LA SUCURSAL`;
   } else if (nombre) {
     data.value.pointOfSale.name = `${nombre}`;
+  } else if (codigo) {
+    data.value.pointOfSale.name = `${codigo}`;
   } else {
     data.value.pointOfSale.name = '';
   }
