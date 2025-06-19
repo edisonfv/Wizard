@@ -224,7 +224,7 @@ const sinRucActive = ref(false)
 const toast = useToast();
 
 // Definir los eventos que este componente puede emitir
-const emit = defineEmits(["ruc-searched", "ruc-not-found", "ruc-valid-for-continue"])
+const emit = defineEmits(["ruc-searched", "ruc-not-found", "ruc-valid-for-continue", "step-valid"])
 
 // --- FUNCIÓN PARA RESETEAR EL STEP DE BÚSQUEDA DE RUC ---
 function resetRucStep() {
