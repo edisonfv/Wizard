@@ -43,7 +43,7 @@
 import { ref, onMounted, watch } from 'vue';
 import FormField from "@/components/ui/FormField.vue";
 import { useInitialData } from "@/composables/useInitialData";
-//import { useWizardStore } from "@/stores/wizardStore";
+import { useWizardStore } from "@/stores/wizardStore";
 
 // Valores iniciales para el formulario
 const initialValues = {
@@ -110,9 +110,14 @@ watch([
 // Watch para mostrar en consola los datos guardados en el lead cada vez que cambian
 watch(data, (nuevoValor) => {
   console.log('[createPOS] Datos guardados en el lead:', JSON.parse(JSON.stringify(nuevoValor)));
+  // Imprimir el estado global del wizard y todos los datos del formulario
+  console.log('[createPOS] Wizard state actualizado:', {
+    wizardState: JSON.parse(JSON.stringify(wizardStore.getCurrentWizardState)),
+    formData: JSON.parse(JSON.stringify(wizardStore.getAllFormData))
+  });
 }, { deep: true });
 
-//const wizardStore = useWizardStore();
+const wizardStore = useWizardStore();
 //const sinRucActive = wizardStore.wizardState?.sinRucActive || false;
 </script>
 
