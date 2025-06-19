@@ -108,6 +108,9 @@ import BillDataForm from './billData.vue';
 const showCopyModal = ref(false);
 const modalAnswered = ref(false);
 
+// Flag para evitar que la copia/limpieza se ejecute más de una vez
+const alreadyAnsweredModal = ref(false);
+
 // Valores iniciales para el formulario
 const initialValues = {
   id: "",
@@ -265,11 +268,11 @@ watch([nombres, apellidos], () => {
 const copyPersonalToBill = () => {
   const billRef = billDataFormRef.value;
   if (billRef && billRef.data && billRef.updateField) {
-    billRef.updateField('cedula', data.value.id);
+    billRef.updateField('documentNumber', data.value.id); // Asegúrate de usar 'documentNumber'
     billRef.updateField('name', data.value.name);
     billRef.updateField('email', data.value.email);
-    if (billRef.setNombres) billRef.setNombres(nombres.value);
-    if (billRef.setApellidos) billRef.setApellidos(apellidos.value);
+    billRef.updateField('phone', data.value.phone); // Copia el teléfono
+    // No tocar manualmente isBillComplete aquí
   }
 };
 
@@ -277,21 +280,29 @@ const copyPersonalToBill = () => {
 const clearBillData = () => {
   const billRef = billDataFormRef.value;
   if (billRef && billRef.data && billRef.updateField) {
-    billRef.updateField('cedula', '');
+    billRef.updateField('documentNumber', '');
     billRef.updateField('name', '');
     billRef.updateField('email', '');
+    billRef.updateField('phone', '');
+    // No tocar manualmente isBillComplete aquí
   }
 };
 
 // Métodos para manejar el click del modal
 const onCopyYes = () => {
-  copyPersonalToBill();
+  if (!alreadyAnsweredModal.value) {
+    copyPersonalToBill();
+    alreadyAnsweredModal.value = true;
+  }
   showCopyModal.value = false;
   modalAnswered.value = true;
 };
 
 const onCopyNo = () => {
-  clearBillData();
+  if (!alreadyAnsweredModal.value) {
+    clearBillData();
+    alreadyAnsweredModal.value = true;
+  }
   showCopyModal.value = false;
   modalAnswered.value = true;
 };
@@ -300,7 +311,7 @@ const onCopyNo = () => {
 watch(
   () => validationState.value.email && data.value.email,
   (show) => {
-    if (show && !modalAnswered.value) {
+    if (show && !modalAnswered.value && !alreadyAnsweredModal.value) {
       showCopyModal.value = true;
     }
     if (show) {
@@ -322,15 +333,28 @@ defineExpose({
 // Escuchar el evento de validación del formulario de facturación y verificar si todos los campos están completos
 const handleBillValidation = (val: boolean) => {
   isBillValid.value = val;
-  // Verificar si todos los campos requeridos están llenos
+  updateBillComplete();
+};
+
+// Nueva función: observar los datos de billData y actualizar isBillComplete
+const updateBillComplete = () => {
   const billRef = billDataFormRef.value;
-  if (billRef && billRef.data) {
+  if (billRef && billRef.data && billRef.data.value) {
     const bill = billRef.data.value;
     isBillComplete.value = !!bill.documentNumber && !!bill.name && !!bill.phone && !!bill.email;
   } else {
     isBillComplete.value = false;
   }
 };
+
+// Observar cambios en los datos de billData para actualizar isBillComplete
+watch(
+  () => billDataFormRef.value?.data?.value,
+  () => {
+    updateBillComplete();
+  },
+  { deep: true }
+);
 </script>
 
 <style scoped>
