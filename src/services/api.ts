@@ -24,6 +24,12 @@ export interface CompanyExist {
 }
 
 // Interfaz para los datos de RUC (search-ruc.json)
+export interface BranchRuc {
+  idBranch: string
+  commercialName: string
+  address: string
+}
+
 export interface RucData {
   ruc: string
   legalName: string
@@ -32,9 +38,7 @@ export interface RucData {
   isAgent: boolean
   accountingRequired: boolean
   categoryRUC: string
-  idBranch: string
-  commercialName: string
-  address: string
+  branches: BranchRuc[]
 }
 
 // Servicio simplificado con tipos

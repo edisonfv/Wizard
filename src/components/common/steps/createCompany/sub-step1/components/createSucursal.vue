@@ -8,10 +8,9 @@
       <label for="branchMenu" class="select-label">Selecciona una sucursal:</label>
       <select id="branchMenu" v-model="selectedBranch" class="branch-select">
         <option disabled value="">-- Seleccione una opción --</option>
-        <option value="001 - Wanqara">001 - Wanqara</option>
-        <option value="002 - Illarli">002 - Illarli</option>
-        <option value="003 - Wanqara">003 - Wanqara</option>
-        <option value="004 - Illarli">004 - Illarli</option>
+        <option v-for="branch in branchOptions" :key="branch.idBranch" :value="`${branch.idBranch} - ${branch.commercialName}`">
+          {{ branch.idBranch }} - {{ branch.commercialName }}
+        </option>
       </select>
     </div>
 
@@ -106,6 +105,8 @@ import {
   validateEmailInRealTime
 } from "@/utils/input-controls";
 import { useWizardStore } from "@/stores/wizardStore";
+import { wizardService } from "@/services/api";
+import { storeToRefs } from 'pinia';
 
 // Valores iniciales para el formulario
 const initialValues = {
@@ -177,6 +178,40 @@ const wizardStore = useWizardStore();
 const sinRucActive = wizardStore.wizardState?.sinRucActive || false;
 
 const selectedBranch = ref("");
+
+// Lista reactiva de sucursales
+const branchOptions = ref<{ idBranch: string; commercialName: string }[]>([]);
+
+// Obtener el RUC desde el store global (companyCreation)
+const { formData } = storeToRefs(wizardStore);
+
+// Función para cargar sucursales según el RUC
+const loadBranchesByRuc = async (ruc: string) => {
+  if (!ruc) {
+    branchOptions.value = [];
+    return;
+  }
+  const rucList = await wizardService.getRucDataBase();
+  const found = rucList.find((item) => item.ruc === ruc);
+  if (found && found.branches) {
+    branchOptions.value = found.branches.map((b: any) => ({
+      idBranch: b.idBranch,
+      commercialName: b.commercialName
+    }));
+  } else {
+    branchOptions.value = [];
+  }
+};
+
+// Observar cambios en el RUC global para recargar sucursales
+watch(
+  () => formData.value.companyCreation.ruc,
+  (newRuc) => {
+    loadBranchesByRuc(newRuc);
+    selectedBranch.value = "";
+  },
+  { immediate: true }
+);
 
 // Watch para actualizar el nombre de la matriz automáticamente
 watch([
