@@ -33,15 +33,13 @@
         icon="mdi:barcode"
         placeholder="Código de la matriz"
         required
-        :readonly="!sinRucActive"
-        :disabled="!sinRucActive"
         @validation="(isValid) => handleValidation('idBranch', isValid)"
       />
     </div>
 
-    <!-- Nombre de tu Sucursal -->
+    <!-- Nombre de tu Sucursal (AUXILIAR) -->
     <FormField
-      v-model="data.branch.name"
+      v-model="data.branch.nameAux"
       label="Nombre"
       icon="mdi:home-city"
       placeholder="Nombre"
@@ -49,14 +47,13 @@
       @validation="(isValid) => handleValidation('name', isValid)"
     />
 
-    <!-- Nombre de la Matriz (solo lectura) -->
+    <!-- Nombre de la Matriz (solo lectura, el que se guarda en el lead) -->
     <FormField
-      v-model="data.branch.nameToSave"
+      v-model="data.branch.name"
       label="Nombre de la Matriz"
       icon="mdi:home-city"
       placeholder="Nombre a guardar"
       required
-      readonly
       @validation="(isValid) => handleValidation('nameToSave', isValid)"
     />
 
@@ -113,12 +110,11 @@ const initialValues = {
   branch: {
     commercialName: '',
     idBranch: '',
-    name: '',
-    nameToSave: '', // <-- Agregado para evitar error de propiedad inexistente
+    name: '', // Este es el que se guarda en el lead
+    nameAux: '', // Auxiliar para el input editable
     address: '',
     phone: '',
     email: '',
-    // Incluimos campos que pueden existir en otras partes del código
     delayedDispatch: false,
     isTouristEstablishment: false
   }
@@ -175,7 +171,7 @@ const validateEmailInput = (event: Event) => {
 };
 
 const wizardStore = useWizardStore();
-const sinRucActive = wizardStore.wizardState?.sinRucActive || false;
+//const sinRucActive = wizardStore.wizardState?.sinRucActive || false;
 
 const selectedBranch = ref("");
 
@@ -216,16 +212,16 @@ watch(
 // Watch para actualizar el nombre de la matriz automáticamente
 watch([
   () => data.value.branch.idBranch,
-  () => data.value.branch.name
-], ([codigo, nombre]) => {
-  if (codigo && nombre) {
-    data.value.branch.nameToSave = `${codigo} - ${nombre}`;
+  () => data.value.branch.nameAux
+], ([codigo, nombreAux]) => {
+  if (codigo && nombreAux) {
+    data.value.branch.name = `${codigo} - ${nombreAux}`;
   } else if (codigo) {
-    data.value.branch.nameToSave = `${codigo}`;
-  } else if (nombre) {
-    data.value.branch.nameToSave = `${nombre}`;
+    data.value.branch.name = `${codigo}`;
+  } else if (nombreAux) {
+    data.value.branch.name = `${nombreAux}`;
   } else {
-    data.value.branch.nameToSave = '';
+    data.value.branch.name = '';
   }
 });
 
